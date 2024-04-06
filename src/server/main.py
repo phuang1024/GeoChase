@@ -33,6 +33,11 @@ def handle_client(conn, addr):
         games[game_id].players[player_id] = Player()
         send(conn, {"game_id": game_id, "player_id": player_id})
 
+        game = games[game_id]
+        if len(game.players) == game.num_players:
+            # Start game
+            pass
+
     elif obj["type"] == "join_game":
         game_id = obj["game_id"]
         if game_id not in games:
