@@ -1,6 +1,6 @@
 import socket
 
-import network
+from utils import network
 
 
 def main():
