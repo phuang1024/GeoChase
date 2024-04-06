@@ -33,7 +33,6 @@ def recv_len(sock, length: int, timeout: float = 3) -> bytes:
 
     If the timeout is reached, raises exception.
     """
-    sock.setblocking(False)
     time_start = time.time()
 
     data = b""
