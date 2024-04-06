@@ -1,20 +1,18 @@
+import argparse
 import socket
 
-from utils import network
+from utils import *
 
 
 def main():
-    # test
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect(("", 12345))
-    obj = {
-        "test": [1, 2, 3],
-        "test2": True,
-    }
-    print("obj:", obj)
-    network.send(sock, obj)
-    print("recv:", network.recv(sock))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", type=str, default="")
+    parser.add_argument("--port", type=int, default=6645)
+    args = parser.parse_args()
 
+    # test
+    resp = request(args.host, args.port, {"type": "echo", "echo": "Hello, world!"})
+    print(resp)
 
 
 if __name__ == "__main__":

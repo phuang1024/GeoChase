@@ -1,3 +1,8 @@
+__all__ = (
+    "GameConfig",
+    "Game",
+)
+
 """
 Classes relating to gameplay.
 """
