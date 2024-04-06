@@ -16,7 +16,7 @@ class MapDrawer:
     scale: float
     """Size of Y display in coords."""
     pos: np.ndarray
-    """Topleft of display in lat, lon coords."""
+    """Center of display in lat, lon coords."""
 
     def __init__(self, osm: OSM):
         self.osm = osm
@@ -24,18 +24,13 @@ class MapDrawer:
         self.pos = np.array(self.osm.get_com())
 
     def render(self, surface):
-        print("Render")
         surface.fill((255, 255, 255))
 
-        get_px = lambda node: self.project(node.lat, node.lon)
-        in_bounds = lambda px: 0 <= px[0] <= WIDTH and 0 <= px[1] <= HEIGHT
-
         for way in self.osm.ways:
-            for i in range(len(way.nodes) - 1):
-                p1 = get_px(way.nodes[i])
-                p2 = get_px(way.nodes[i + 1])
-                if in_bounds(p1) or in_bounds(p2):
-                    pygame.draw.line(surface, (0, 0, 0), p1, p2, 1)
+            points = []
+            for node in way.nodes:
+                points.append(self.project(node.lat, node.lon))
+            pygame.draw.lines(surface, (0, 0, 0), False, points)
 
         return surface
 
@@ -46,7 +41,7 @@ class MapDrawer:
         scale = np.array([x_scale, -y_scale])
 
         coord_pos = np.array([lon, lat])
-        px_pos = (coord_pos - self.pos) * scale
+        px_pos = (coord_pos - self.pos) * scale + np.array([WIDTH / 2, HEIGHT / 2])
 
         return px_pos
 
@@ -57,11 +52,39 @@ def game_loop():
     osm = parse_osm_file("../../assets/test.osm")
     map_drawer = MapDrawer(osm)
 
+    # Store state at mousedown.
+    click_mouse_pos = None
+    click_window_pos = None
+    # Updated every iter.
+    last_mouse_pos = None
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    map_drawer.scale *= 1.1
+                elif event.button == 5:
+                    map_drawer.scale /= 1.1
+                elif event.button == 1:
+                    click_mouse_pos = np.array(event.pos)
+                    click_window_pos = map_drawer.pos
+
+        # Handle mouse drag
+        mouse_pressed = pygame.mouse.get_pressed()
+        mouse_pos = np.array(pygame.mouse.get_pos())
+        if mouse_pressed[0] and (mouse_pos != last_mouse_pos).any():
+            mouse_delta = mouse_pos - click_mouse_pos
+
+            # Pixels per coord
+            y_scale = HEIGHT / map_drawer.scale
+            x_scale = y_scale / map_drawer.osm.stretch_factor
+            scale = np.array([x_scale, -y_scale])
+
+            map_drawer.pos = click_window_pos - mouse_delta / scale
 
         map_drawer.render(surface)
         pygame.display.flip()
