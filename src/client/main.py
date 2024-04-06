@@ -2,6 +2,7 @@ import argparse
 
 import time
 
+from display import game_loop
 from utils import *
 
 
@@ -52,6 +53,9 @@ def main():
     parser.add_argument("--host", type=str, default="")
     parser.add_argument("--port", type=int, default=6645)
     args = parser.parse_args()
+
+    game_loop()
+    return
 
     ret = get_session_id(args)
     if ret is None:

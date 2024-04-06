@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
+import numpy as np
+
 
 @dataclass
 class Node:
@@ -27,7 +29,18 @@ class OSM:
     bottom: float
     right: float
 
-    scaling_factor: float = 1
+    # 1 / cos(latitude)
+    stretch_factor: float = 1
+
+    def get_com(self):
+        lat = 0
+        lon = 0
+        for node in self.nodes.values():
+            lat += node.lat
+            lon += node.lon
+        lat /= len(self.nodes)
+        lon /= len(self.nodes)
+        return lon, lat
 
 
 def parse_osm_file(path):
@@ -72,10 +85,12 @@ def parse_osm(root):
                     way.nodes.append(nodes[int(subchild.attrib["ref"])])
                 elif subchild.tag == "tag":
                     way.tags[subchild.attrib["k"]] = subchild.attrib["v"]
-            ways.append(way)
+
+            if "highway" in way.tags:
+                ways.append(way)
 
     # TODO explain this
-    scaling = 1 / np.cos(np.radians(top))
+    stretch = 1 / np.cos(np.radians(top))
 
     return OSM(
         nodes=nodes,
@@ -84,5 +99,5 @@ def parse_osm(root):
         left=left,
         bottom=bottom,
         right=right,
-        scaling_factor=scaling,
+        stretch_factor=stretch,
     )
