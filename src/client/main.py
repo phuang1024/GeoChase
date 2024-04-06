@@ -1,27 +1,18 @@
-# Example file showing a basic pygame "game loop"
-import pygame
+import argparse
 
-# pygame setup
-pygame.init()
-screen = pygame.display.set_mode((1840, 1035))
-clock = pygame.time.Clock()
-running = True
+from utils import *
 
-while running:
-    # poll for events
-    # pygame.QUIT event means the user clicked X to close your window
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--host", type=str, default="")
+    parser.add_argument("--port", type=int, default=6645)
+    args = parser.parse_args()
 
-    # RENDER YOUR GAME HERE
+    # test
+    resp = request(args.host, args.port, {"type": "echo", "echo": "Hello, world!"})
+    print(resp)
 
-    # flip() the display to put your work on screen
-    pygame.display.flip()
 
-    clock.tick(60)  # limits FPS to 60
-
-pygame.quit()
+if __name__ == "__main__":
+    main()
