@@ -1,6 +1,7 @@
 __all__ = (
     "GameConfig",
     "Game",
+    "Player",
 )
 
 """
@@ -20,3 +21,13 @@ class GameConfig:
 class Game:
     config: GameConfig
     map: Map
+    players: dict[str, "Player"]
+    num_players: int
+
+    def __init__(self, num_players):
+        self.players = {}
+        self.num_players = num_players
+
+
+class Player:
+    pass
