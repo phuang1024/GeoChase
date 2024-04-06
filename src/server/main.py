@@ -1,8 +1,17 @@
 import argparse
+import random
 import socket
+import string
 from threading import Thread
 
 from utils import *
+
+# Globals
+games = {}
+
+
+def generate_id():
+    return "".join(random.choices(string.digits, k=6))
 
 
 def handle_client(conn, addr):
@@ -10,7 +19,6 @@ def handle_client(conn, addr):
 
     if not isinstance(obj, dict) or "type" not in obj:
         print(f"{addr}: Invalid message")
-        conn.close()
         return
 
     print(f"{addr}: {obj['type']}")
@@ -18,7 +26,26 @@ def handle_client(conn, addr):
     if obj["type"] == "echo":
         send(conn, obj["echo"])
 
-    # TODO stuff.
+    elif obj["type"] == "new_game":
+        game_id = generate_id()
+        games[game_id] = Game(obj["num_players"])
+        player_id = generate_id()
+        games[game_id].players[player_id] = Player()
+        send(conn, {"game_id": game_id, "player_id": player_id})
+
+    elif obj["type"] == "join_game":
+        game_id = obj["game_id"]
+        if game_id not in games:
+            send(conn, {"success": False})
+            return
+
+        player_id = generate_id()
+        games[game_id].players[player_id] = Player()
+        send(conn, {"success": True, "player_id": player_id})
+
+    elif obj["type"] == "game_started":
+        game = games[obj["game_id"]]
+        send(conn, {"started": len(game.players) == game.num_players})
 
 
 def main():

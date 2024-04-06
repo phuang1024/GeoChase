@@ -1,16 +1,20 @@
 # GeoChase
+
 Play tag using the local geography.
 
 
 ## Client-Server Communication API
 
-### Game Start
+### New game
 
-Server:
 ```json
 {
-    "type": "game_start",
-    "player_type": "cop | robber",
+    "type": "new_game",
+    "num_players": 3,
 }
 ```
-
+```json
+{
+    "game_id": "asdf1234",
+}
+```
