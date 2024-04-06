@@ -1,25 +1,24 @@
 """
 Networking utilities submodule.
 
-Serialization is done with zlib_compress(json(obj))
+Serialization is done with pickle(obj)
 
 Message protocol is:
 Length of message as 4 bytes little-endian
 Message (bytes).
 """
 
-import json
+import pickle
 import struct
 import time
-import zlib
 
 
 def serialize(obj) -> bytes:
-    return zlib.compress(json.dumps(obj).encode("utf-8"))
+    return pickle.dumps(obj)
 
 
 def deserialize(data: bytes):
-    return json.loads(zlib.decompress(data).decode("utf-8"))
+    return pickle.loads(data)
 
 
 def send(sock, obj) -> None:
