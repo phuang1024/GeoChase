@@ -10,7 +10,7 @@ HEIGHT = 720
 
 class Player:
     SIZE = 50
-    SPEED = 5 / 1600 / COORDS_TO_MILES
+    SPEED = 80 / 1600 / COORDS_TO_MILES
 
     pos: np.ndarray
     """Center of display in lat, lon coords."""
@@ -36,18 +36,6 @@ class Player:
         pixel_pos -= self.SIZE // 2
         surface.blit(self.surface, pixel_pos)
         return surface
-
-    def move_up(self, time_delta):
-        self.pos[1] += self.SPEED * time_delta
-
-    def move_down(self, time_delta):
-        self.pos[1] -= self.SPEED * time_delta
-
-    def move_left(self, time_delta):
-        self.pos[0] -= self.SPEED * time_delta
-
-    def move_right(self, time_delta):
-        self.pos[0] += self.SPEED * time_delta
 
 
 class Cop(Player):

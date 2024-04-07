@@ -89,14 +89,18 @@ def game_loop():
                     click_window_pos = map_drawer.pos
 
         keys = pygame.key.get_pressed()
+        player_mvt = np.array([0, 0])
         if keys[pygame.K_UP]:
-            player.move_up(time_delta)
+            player_mvt[1] += 1
         if keys[pygame.K_DOWN]:
-            player.move_down(time_delta)
+            player_mvt[1] -= 1
         if keys[pygame.K_LEFT]:
-            player.move_left(time_delta)
+            player_mvt[0] -= 1
         if keys[pygame.K_RIGHT]:
-            player.move_right(time_delta)
+            player_mvt[0] += 1
+        if player_mvt.any():
+            player_mvt = player_mvt / np.linalg.norm(player_mvt)
+            player.pos += player_mvt * player.SPEED * time_delta
 
         # Handle mouse drag
         mouse_pressed = pygame.mouse.get_pressed()
