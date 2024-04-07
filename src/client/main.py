@@ -82,7 +82,7 @@ def wait_for_start(args, game_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=4567)
+    parser.add_argument("--port", type=int, default=4570)
     args = parser.parse_args()
 
     ret = get_session_id(args)

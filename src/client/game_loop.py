@@ -44,7 +44,7 @@ def game_loop(args, game_id, player_id, player_type):
     osm = metadata["osm"]
     map_drawer = MapDrawer(osm)
     if player_type == "heli":
-        map_drawer.scale *= 2
+        map_drawer.scale *= 1.3
 
     player_pos = osm.get_rand_pos()
 
@@ -65,6 +65,10 @@ def game_loop(args, game_id, player_id, player_type):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 return
+
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r and player_type == "robber":
+                    request(args.host, args.port, {"type": "rob", "game_id": game_id, "pos": player_pos})
 
         # Handle user movement.
         player_mvt = get_mvt_input()
@@ -112,6 +116,7 @@ def game_loop(args, game_id, player_id, player_type):
         draw_info(surface, 30, [
             f"Num players: {metadata['num_players']}",
             f"Num robbers: {metadata['num_robbers']}",
+            f"Remaining targets: {len(status['targets'])}",
             f"Position: {player_pos[0]:.4f}, {player_pos[1]:.4f}",
             f"Velocity: {player_mvt[0]:.1f}, {player_mvt[1]:.1f}",
         ])

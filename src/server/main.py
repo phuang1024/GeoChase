@@ -4,6 +4,7 @@ import socket
 import string
 from threading import Thread
 
+import numpy as np
 from utils import *
 
 # Globals
@@ -71,7 +72,7 @@ def handle_client(conn, addr):
         send(conn, {
             "players": game.players,
             "alerts": game.alerts,
-            "targets": game.targets,
+            "targets": [x.pos for x in game.targets.values()],
         })
 
         # Trigger false alert with probability.
@@ -84,11 +85,29 @@ def handle_client(conn, addr):
         game = games[obj["game_id"]]
         game.alerts.append(obj["alert"])
 
+    elif obj["type"] == "rob":
+        game = games[obj["game_id"]]
+        pos = np.array(obj["pos"])
+
+        to_remove = []
+        for key, target in game.targets.items():
+            if np.linalg.norm(target.pos - pos) < 0.001:
+                to_remove.append(key)
+        for key in to_remove:
+            target = game.targets.pop(key)
+            road = target.street
+            if "name" in road.tags:
+                game.alerts.append(f"Alert on: {target.street.tags['name']}")
+            else:
+                game.alerts.append("Alert on: Unknown")
+
+        send(conn, {"success": True})
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=4567)
+    parser.add_argument("--port", type=int, default=4570)
     args = parser.parse_args()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

@@ -74,10 +74,13 @@ class OSM:
                 break
         return way
 
-    def get_rand_pos(self):
+    def get_rand_road_pos(self):
         way = self.get_rand_road()
         node = random.choice(way.nodes)
-        return node.lon, node.lat
+        return way, (node.lon, node.lat)
+
+    def get_rand_pos(self):
+        return self.get_rand_road_pos()[1]
 
 
 def parse_osm_file(path):
