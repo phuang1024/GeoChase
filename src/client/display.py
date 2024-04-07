@@ -27,6 +27,12 @@ class MapDrawer:
         surface.fill((255, 255, 255))
 
         for way in self.osm.ways:
+            # Check if in screen bounds.
+            left, top = self.project(way.top, way.left)
+            right, bottom = self.project(way.bottom, way.right)
+            if right < 0 or left > WIDTH or top < 0 or bottom > HEIGHT:
+                continue
+
             points = []
             for node in way.nodes:
                 points.append(self.project(node.lat, node.lon))
@@ -49,7 +55,7 @@ class MapDrawer:
 def game_loop():
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    osm = parse_osm_file("../../assets/test.osm")
+    osm = parse_osm_file("/tmp/big.osm")
     map_drawer = MapDrawer(osm)
 
     # Store state at mousedown.

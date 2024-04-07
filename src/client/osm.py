@@ -17,6 +17,12 @@ class Way:
     nodes: list[Node]
     tags: dict[str, str]
 
+    # lat and lon bounds
+    top: float = float("inf")
+    left: float = float("inf")
+    bottom: float = float("-inf")
+    right: float = float("-inf")
+
 
 @dataclass
 class OSM:
@@ -85,6 +91,11 @@ def parse_osm(root):
                     way.nodes.append(nodes[int(subchild.attrib["ref"])])
                 elif subchild.tag == "tag":
                     way.tags[subchild.attrib["k"]] = subchild.attrib["v"]
+
+            way.top = min(node.lat for node in way.nodes)
+            way.left = min(node.lon for node in way.nodes)
+            way.bottom = max(node.lat for node in way.nodes)
+            way.right = max(node.lon for node in way.nodes)
 
             if "highway" in way.tags:
                 ways.append(way)
