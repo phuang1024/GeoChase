@@ -1,0 +1,60 @@
+import numpy as np
+import pygame
+from osm import OSM, parse_osm_file
+
+from utils import COORDS_TO_MILES
+
+WIDTH = 1280
+HEIGHT = 720
+
+
+class Player:
+    SIZE = 50
+    SPEED = 5 / 1600 / COORDS_TO_MILES
+
+    pos: np.ndarray
+    """Center of display in lat, lon coords."""
+
+    def __init__(self, start: np.ndarray, image: str):
+        self.pos = np.array(start)
+
+        img = pygame.image.load(image).convert_alpha()
+        img_surf = pygame.transform.scale(img, (self.SIZE, self.SIZE))
+        self.surface = pygame.Surface((self.SIZE, self.SIZE), pygame.SRCALPHA)
+        self.surface.fill((0, 0, 0, 0))
+        self.surface.blit(img_surf, (0, 0))
+        pygame.draw.circle(
+            self.surface,
+            (255, 0, 0),
+            (self.SIZE // 2, self.SIZE // 2),
+            self.SIZE // 2,
+            2,
+        )
+
+    def render(self, surface, map_drawer):
+        pixel_pos = map_drawer.project(*self.pos[::-1])
+        pixel_pos -= self.SIZE // 2
+        surface.blit(self.surface, pixel_pos)
+        return surface
+
+    def move_up(self, time_delta):
+        self.pos[1] += self.SPEED * time_delta
+
+    def move_down(self, time_delta):
+        self.pos[1] -= self.SPEED * time_delta
+
+    def move_left(self, time_delta):
+        self.pos[0] -= self.SPEED * time_delta
+
+    def move_right(self, time_delta):
+        self.pos[0] += self.SPEED * time_delta
+
+
+class Cop(Player):
+    def __init__(self, start: np.ndarray):
+        super().__init__(start, "../../assets/cop.png")
+
+
+class Robber(Player):
+    def __init__(self, start: np.ndarray):
+        super().__init__(start, "../../assets/robber.png")

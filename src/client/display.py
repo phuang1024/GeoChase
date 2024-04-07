@@ -1,14 +1,15 @@
 import math
+import time
 
 import numpy as np
 import pygame
-
 from osm import OSM, parse_osm_file
+from player import Cop, Player, Robber
+
+from utils import COORDS_TO_MILES
 
 WIDTH = 1280
 HEIGHT = 720
-
-COORDS_TO_MILES = 2 * math.pi * 3959 / 360
 
 
 class MapDrawer:
@@ -58,13 +59,21 @@ def game_loop():
     osm = parse_osm_file("/tmp/big.osm")
     map_drawer = MapDrawer(osm)
 
-    # Store state at mousedown.
+    player = Cop(osm.get_com())
+
+    last_time = time.time()
+    time_delta = 0
+
+    # Store state at mousedown
     click_mouse_pos = None
     click_window_pos = None
-    # Updated every iter.
+    # Updated every iter
     last_mouse_pos = None
 
     while True:
+        time_delta = time.time() - last_time
+        last_time = time.time()
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -78,6 +87,16 @@ def game_loop():
                 elif event.button == 1:
                     click_mouse_pos = np.array(event.pos)
                     click_window_pos = map_drawer.pos
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            player.move_up(time_delta)
+        if keys[pygame.K_DOWN]:
+            player.move_down(time_delta)
+        if keys[pygame.K_LEFT]:
+            player.move_left(time_delta)
+        if keys[pygame.K_RIGHT]:
+            player.move_right(time_delta)
 
         # Handle mouse drag
         mouse_pressed = pygame.mouse.get_pressed()
@@ -93,4 +112,5 @@ def game_loop():
             map_drawer.pos = click_window_pos - mouse_delta / scale
 
         map_drawer.render(surface)
-        pygame.display.flip()
+        player.render(surface, map_drawer)
+        pygame.display.update()
