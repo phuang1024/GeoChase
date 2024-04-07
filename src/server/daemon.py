@@ -26,5 +26,8 @@ def daemon(games):
     while True:
         time.sleep(0.2)
 
-        for game in games.values():
-            update_game(game)
+        try:
+            for game in games.values():
+                update_game(game)
+        except Exception as e:
+            print(f"Error in daemon: {e}")
