@@ -30,7 +30,7 @@ def handle_client(conn, addr):
         game_id = generate_id()
         games[game_id] = Game(obj["num_players"])
         player_id = generate_id()
-        games[game_id].players[player_id] = Player()
+        games[game_id].players[player_id] = Player(player_id)
         send(conn, {"game_id": game_id, "player_id": player_id})
 
         game = games[game_id]
@@ -45,7 +45,7 @@ def handle_client(conn, addr):
             return
 
         player_id = generate_id()
-        games[game_id].players[player_id] = Player()
+        games[game_id].players[player_id] = Player(player_id)
         send(conn, {"success": True, "player_id": player_id})
 
     elif obj["type"] == "game_started":

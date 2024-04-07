@@ -1,6 +1,8 @@
 import argparse
-
 import time
+
+import pygame
+pygame.init()
 
 from game_loop import game_loop
 from utils import *
@@ -54,15 +56,14 @@ def main():
     parser.add_argument("--port", type=int, default=6645)
     args = parser.parse_args()
 
-    game_loop()
-    return
-
     ret = get_session_id(args)
     if ret is None:
         return
 
     game_id, player_id = ret
     wait_for_start(args, game_id)
+
+    game_loop(args, game_id, player_id)
 
 
 if __name__ == "__main__":
