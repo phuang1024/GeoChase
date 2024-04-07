@@ -126,7 +126,7 @@ def game_loop(args, game_id, player_id, player_type):
             last_player_pos = player_pos.copy()
 
         # Draw targets
-        if player_type == "robber":
+        if player_type in ("robber", "spectator"):
             for target in status["targets"]:
                 draw_player(surface, map_drawer, "target", target)
 
