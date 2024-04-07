@@ -28,6 +28,7 @@ class Node:
     id: int
     lat: float
     lon: float
+    tags: dict[str, str]
 
 
 @dataclass
@@ -70,7 +71,7 @@ class OSM:
     def get_rand_road(self):
         while True:
             way = random.choice(self.ways)
-            if way.tags["highway"] in VALID_ROAD_TYPES:
+            if way.tags.get("highway", None) in VALID_ROAD_TYPES:
                 break
         return way
 
@@ -103,10 +104,17 @@ def parse_osm(root):
             id = int(child.attrib["id"])
             lat = float(child.attrib["lat"])
             lon = float(child.attrib["lon"])
+
+            tags = {}
+            for subchild in child:
+                if subchild.tag == "tag":
+                    tags[subchild.attrib["k"]] = subchild.attrib["v"]
+
             nodes[id] = Node(
                 id=id,
                 lat=lat,
                 lon=lon,
+                tags=tags
             )
 
             top = min(top, lat)
@@ -131,7 +139,7 @@ def parse_osm(root):
             way.bottom = max(node.lat for node in way.nodes)
             way.right = max(node.lon for node in way.nodes)
 
-            if "highway" in way.tags:
+            if "highway" in way.tags or "addr:street" in way.tags:
                 ways.append(way)
 
     # TODO explain this

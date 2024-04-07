@@ -47,7 +47,8 @@ def game_loop(args, game_id, player_id, player_type):
     if player_type == "heli":
         map_drawer.scale *= 1.3
 
-    player_pos = osm.get_rand_pos()
+    player_pos = np.array(osm.get_rand_pos())
+    last_player_pos = player_pos.copy()
 
     last_time = time.time()
     time_delta = 0
@@ -109,6 +110,11 @@ def game_loop(args, game_id, player_id, player_type):
 
             pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
             draw_player(surface, map_drawer, player.type, pos)
+
+        # Update roads
+        if np.linalg.norm(player_pos - last_player_pos) > 0.0065:
+            map_drawer.update_roads()
+            last_player_pos = player_pos.copy()
 
         # Draw targets
         if player_type == "robber":
