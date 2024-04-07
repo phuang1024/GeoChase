@@ -73,7 +73,7 @@ def game_loop(args, game_id, player_id, player_type):
 
         # Handle user movement.
         player_mvt = get_mvt_input()
-        if player_type == "heli":
+        if player_type in ("heli", "spectator"):
             player_pos += player_mvt * PLAYER_SPEED * time_delta * 2
         else:
             player_pos = map_drawer.force_road(player_pos, player_mvt * PLAYER_SPEED * time_delta)
@@ -89,6 +89,12 @@ def game_loop(args, game_id, player_id, player_type):
                 "vel": player_mvt,
             })
             last_status_time = time.time()
+
+            for player in status["players"].values():
+                if player.id == player_id:
+                    player_type = player.type
+            if player_type == "spectator":
+                map_drawer.scale = 2 / COORDS_TO_MILES
 
         # Render
         surface.fill((255, 255, 255))
@@ -110,12 +116,12 @@ def game_loop(args, game_id, player_id, player_type):
                 draw_player(surface, map_drawer, "target", target)
 
         # Visibility mask
-        surface.blit(HELI_MASK if player_type == "heli" else VISIBILITY_MASK, (0, 0))
+        if player_type != "spectator":
+            surface.blit(HELI_MASK if player_type == "heli" else VISIBILITY_MASK, (0, 0))
 
         # Info
         draw_info(surface, 30, [
-            f"Num players: {metadata['num_players']}",
-            f"Num robbers: {metadata['num_robbers']}",
+            f"Robbers: {metadata['num_robbers']}",
             f"Remaining targets: {len(status['targets'])}",
             f"Position: {player_pos[0]:.4f}, {player_pos[1]:.4f}",
             f"Velocity: {player_mvt[0]:.1f}, {player_mvt[1]:.1f}",

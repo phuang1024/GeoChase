@@ -9,6 +9,9 @@ SPRITES = {
 
 
 def draw_player(surface, map_drawer, type, pos):
+    if type == "spectator":
+        return
+
     image = SPRITES[type]
     pixel_pos = map_drawer.project(*pos[::-1])
     pixel_pos -= SIZE // 2
