@@ -1,14 +1,26 @@
 __all__ = (
+    "VALID_ROAD_TYPES",
     "Node",
     "Way",
     "OSM",
     "parse_osm_file",
 )
 
+import random
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
 
 import numpy as np
+
+VALID_ROAD_TYPES = (
+    "motorway",
+    "trunk",
+    "primary",
+    "secondary",
+    "tertiary",
+    "residential",
+    "unclassified",
+)
 
 
 @dataclass
@@ -54,6 +66,14 @@ class OSM:
         lat /= len(self.nodes)
         lon /= len(self.nodes)
         return lon, lat
+
+    def get_rand_pos(self):
+        while True:
+            way = random.choice(self.ways)
+            if way.tags["highway"] in VALID_ROAD_TYPES:
+                break
+        node = random.choice(way.nodes)
+        return node.lon, node.lat
 
 
 def parse_osm_file(path):

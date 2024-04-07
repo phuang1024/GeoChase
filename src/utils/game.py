@@ -1,5 +1,4 @@
 __all__ = (
-    "GameConfig",
     "Game",
     "Player",
 )
@@ -8,21 +7,12 @@ __all__ = (
 Classes relating to gameplay.
 """
 
-from dataclasses import dataclass
-
 import numpy as np
 
 from .map import OSM
 
 
-@dataclass
-class GameConfig:
-    num_players: int
-    num_robbers: int
-
-
 class Game:
-    config: GameConfig
     osm: OSM
     players: dict[str, "Player"]
     num_players: int

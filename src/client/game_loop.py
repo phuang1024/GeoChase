@@ -18,7 +18,7 @@ def game_loop(args, game_id, player_id):
     osm = metadata["osm"]
     map_drawer = MapDrawer(osm)
 
-    player_pos = osm.get_com()
+    player_pos = osm.get_rand_pos()
 
     last_time = time.time()
     time_delta = 0

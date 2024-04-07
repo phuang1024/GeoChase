@@ -17,16 +17,6 @@ VISIBILITY = 200
 
 PLAYER_SPEED = 80 / 1600 / COORDS_TO_MILES
 
-VALID_ROAD_TYPES = (
-    "motorway",
-    "trunk",
-    "primary",
-    "secondary",
-    "tertiary",
-    "residential",
-    "unclassified",
-)
-
 VISIBILITY_MASK = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 VISIBILITY_MASK.fill((255, 255, 255, 255))
 for i in range(VISIBILITY, 0, -1):
