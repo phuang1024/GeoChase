@@ -59,7 +59,8 @@ class MapDrawer:
         road_surf = pygame.transform.box_blur(road_surf, 2)
         surface.blit(road_surf, (0, 0))
 
-        surface.blit(self.roads_surf, self.project(*self.roads_pos[::-1]))
+        roads_pos = self.project(*self.roads_pos[::-1])
+        surface.blit(self.roads_surf, roads_pos - np.array([WIDTH / 2, HEIGHT / 2]))
 
         window.blit(surface, (0, 0))
 
@@ -79,7 +80,7 @@ class MapDrawer:
         return px_pos
 
     def update_roads(self):
-        font = pygame.font.SysFont("Arial", ROAD_WIDTH)
+        font = pygame.font.SysFont("Arial", ROAD_WIDTH, True)
 
         self.roads_surf.fill((255, 255, 255, 0))
 
@@ -91,10 +92,22 @@ class MapDrawer:
 
             if np.random.rand() < STREET_NAME_CHANCE:
                 text = font.render(way.tags["addr:street"], True, (0, 0, 0, 120))
-                loc = (way.nodes[0].lat, way.nodes[0].lon)
-                pos = self.project(*loc)
-                print(text, pos)
-                self.roads_surf.blit(text, pos)
+                n1 = way.nodes[0]
+                # n2 = way.nodes[min(int(text.get_width() / 25), len(way.nodes) - 1)]
+                n2 = way.nodes[1]
+                node1 = self.project(n1.lat, n1.lon)
+                node2 = self.project(n2.lat, n2.lon)
+                angle = np.degrees(np.arctan2(node2[1] - node1[1], node2[0] - node1[0]))
+                if angle < -90:
+                    angle = -(angle + 270)
+                else:
+                    angle = 90 - angle
+
+                if abs(angle) > 90:
+                    angle += 180
+                text = pygame.transform.rotate(text, angle)
+                node1 -= np.array([text.get_width() / 2, text.get_height() / 2])
+                self.roads_surf.blit(text, node1)
 
     def force_road(self, loc, mvt) -> np.ndarray:
         """
