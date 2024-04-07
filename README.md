@@ -6,9 +6,9 @@ Play tag using the local geography.
 
 ## Usage
 
-`python server.py`
+`python src/server/main.py`
 
-`python client.py` as many times as needed.
+`python src/client/main.py` as many times as needed.
 
 Hotkeys:
 
