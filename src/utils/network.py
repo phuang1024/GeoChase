@@ -33,7 +33,7 @@ def send(sock, obj) -> None:
     sock.sendall(struct.pack("<I", len(data)) + data)
 
 
-def recv_len(sock, length: int, timeout: float = 3) -> bytes:
+def recv_len(sock, length: int, timeout: float = 300) -> bytes:
     """
     Receives until the specified length is reached.
 
