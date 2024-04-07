@@ -15,7 +15,7 @@ FONT = pygame.font.SysFont("courier", 16)
 COORDS_TO_MILES = 2 * math.pi * 3959 / 360
 
 ROAD_WIDTH = 15
-VISIBILITY = 350
+VISIBILITY = 300
 
 STREET_NAME_CHANCE = .2
 

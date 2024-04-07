@@ -27,6 +27,7 @@ def get_session_id(args) -> tuple[str, str, str] | None:
         num_players = int(input("  Number of players: "))
         num_robbers = int(input("  Number of robbers: "))
         num_helis = int(input("  Number of helicopters: "))
+        num_targets = int(input("  Number of targets: "))
 
         osm = parse_osm_file(osm_path)
         resp = request(args.host, args.port, {
@@ -35,6 +36,7 @@ def get_session_id(args) -> tuple[str, str, str] | None:
             "num_players": num_players,
             "num_robbers": num_robbers,
             "num_helis": num_helis,
+            "num_targets": num_targets,
         })
 
         print("Game ID:", resp["game_id"])
@@ -48,6 +50,20 @@ def get_session_id(args) -> tuple[str, str, str] | None:
             return game_id, resp["player_id"], resp["type"]
         else:
             print("Invalid game ID.")
+
+    elif choice == "3":
+        # Debug testing create game (hardcoded, fast).
+        resp = request(args.host, args.port, {
+            "type": "new_game",
+            "osm": parse_osm_file("../../assets/big.osm"),
+            "num_players": 2,
+            "num_robbers": 1,
+            "num_helis": 1,
+            "num_targets": 10,
+        })
+
+        print("Game ID:", resp["game_id"])
+        return resp["game_id"], resp["player_id"], resp["type"]
 
     else:
         print("Invalid choice.")
@@ -66,7 +82,7 @@ def wait_for_start(args, game_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=4566)
+    parser.add_argument("--port", type=int, default=4570)
     args = parser.parse_args()
 
     ret = get_session_id(args)

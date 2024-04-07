@@ -4,6 +4,7 @@ import socket
 import string
 from threading import Thread
 
+import numpy as np
 from utils import *
 
 # Globals
@@ -36,6 +37,7 @@ def handle_client(conn, addr):
             game.num_robbers = obj["num_robbers"]
             game.num_helis = obj["num_helis"]
             game.num_cops = game.num_players - game.num_robbers - game.num_helis
+            game.generate_targets(obj["num_targets"])
         else:
             game_id = obj["game_id"]
             if game_id not in games:
@@ -67,7 +69,11 @@ def handle_client(conn, addr):
         player.pos = obj["pos"]
         player.vel = obj["vel"]
 
-        send(conn, {"players": game.players, "alerts": game.alerts})
+        send(conn, {
+            "players": game.players,
+            "alerts": game.alerts,
+            "targets": [x.pos for x in game.targets.values()],
+        })
 
         # Trigger false alert with probability.
         if random.random() < 0.005:
@@ -79,11 +85,29 @@ def handle_client(conn, addr):
         game = games[obj["game_id"]]
         game.alerts.append(obj["alert"])
 
+    elif obj["type"] == "rob":
+        game = games[obj["game_id"]]
+        pos = np.array(obj["pos"])
+
+        to_remove = []
+        for key, target in game.targets.items():
+            if np.linalg.norm(target.pos - pos) < 0.001:
+                to_remove.append(key)
+        for key in to_remove:
+            target = game.targets.pop(key)
+            road = target.street
+            if "name" in road.tags:
+                game.alerts.append(f"Alert on: {target.street.tags['name']}")
+            else:
+                game.alerts.append("Alert on: Unknown")
+
+        send(conn, {"success": True})
+
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=4566)
+    parser.add_argument("--port", type=int, default=4570)
     args = parser.parse_args()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

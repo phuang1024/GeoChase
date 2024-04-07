@@ -7,6 +7,8 @@ __all__ = (
 Classes relating to gameplay.
 """
 
+from dataclasses import dataclass
+
 import numpy as np
 
 from .map import OSM
@@ -20,10 +22,12 @@ class Game:
     num_helis: int
     num_cops: int
     alerts: list[str]
+    targets: dict[int, "Target"]
 
     def __init__(self):
         self.players = {}
         self.alerts = []
+        self.targets = {}
 
     def num_players_of(self, type: str) -> int:
         return sum(1 for player in self.players.values() if player.type == type)
@@ -42,6 +46,12 @@ class Game:
 
         return remain
 
+    def generate_targets(self, num_targets: int):
+        for i in range(num_targets):
+            street, pos = self.osm.get_rand_road_pos()
+            pos = np.array(pos)
+            self.targets[i] = Target(pos, street)
+
 
 class Player:
     id: str
@@ -54,3 +64,9 @@ class Player:
         self.vel = np.zeros(2)
         self.id = id
         self.type = type
+
+
+@dataclass
+class Target:
+    pos: np.ndarray
+    street: "Way"
