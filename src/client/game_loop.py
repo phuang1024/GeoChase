@@ -9,6 +9,8 @@ from map_drawer import MapDrawer
 from osm import parse_osm_file
 from player import *
 
+STATUS_INTERVAL = 0.3
+
 
 def game_loop(args, game_id, player_id):
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -20,8 +22,10 @@ def game_loop(args, game_id, player_id):
 
     last_time = time.time()
     time_delta = 0
+    last_status_time = time.time()
 
     load_player_sprites()
+    other_players = []
 
     """
     # Store state at mousedown
@@ -67,13 +71,17 @@ def game_loop(args, game_id, player_id):
             player_pos += player_mvt * PLAYER_SPEED * time_delta
 
         # Update status with server.
-        resp = request(args.host, args.port, {
-            "type": "game_state",
-            "game_id": game_id,
-            "player_id": player_id,
-            "pos": player_pos,
-            "vel": None,
-        })
+        if time.time() - last_status_time > STATUS_INTERVAL:
+            last_status_time = time.time()
+
+            resp = request(args.host, args.port, {
+                "type": "game_state",
+                "game_id": game_id,
+                "player_id": player_id,
+                "pos": player_pos,
+                "vel": None,
+            })
+            other_players = resp["players"].values()
 
         """
         # Handle mouse drag
@@ -93,7 +101,13 @@ def game_loop(args, game_id, player_id):
 
         # Render
         surface.fill((255, 255, 255))
+
         map_drawer.render(surface)
+
         draw_player(surface, map_drawer, "cop", player_pos)
+        for player in other_players:
+            if player.id == player_id:
+                continue
+            draw_player(surface, map_drawer, "cop", player.pos)
 
         pygame.display.update()

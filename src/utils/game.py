@@ -32,9 +32,11 @@ class Game:
 
 
 class Player:
+    id: str
     pos: np.ndarray
     vel: np.ndarray
 
-    def __init__(self):
+    def __init__(self, id):
         self.pos = np.zeros(2)
         self.vel = np.zeros(2)
+        self.id = id
