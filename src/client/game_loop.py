@@ -2,23 +2,26 @@ import time
 
 import numpy as np
 import pygame
+from utils import request
 
 from constants import *
 from map_drawer import MapDrawer
 from osm import parse_osm_file
-from player import Cop, Player, Robber
+from player import *
 
 
-def game_loop():
+def game_loop(args, game_id, player_id):
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
     osm = parse_osm_file("/tmp/big.osm")
     map_drawer = MapDrawer(osm)
 
-    player = Cop(osm.get_com())
+    player_pos = osm.get_com()
 
     last_time = time.time()
     time_delta = 0
+
+    load_player_sprites()
 
     """
     # Store state at mousedown
@@ -48,6 +51,7 @@ def game_loop():
                     click_window_pos = map_drawer.pos
                 """
 
+        # Handle user movement.
         keys = pygame.key.get_pressed()
         player_mvt = np.array([0, 0])
         if keys[pygame.K_UP]:
@@ -60,7 +64,16 @@ def game_loop():
             player_mvt[0] += 1
         if player_mvt.any():
             player_mvt = player_mvt / np.linalg.norm(player_mvt)
-            player.pos += player_mvt * player.SPEED * time_delta
+            player_pos += player_mvt * PLAYER_SPEED * time_delta
+
+        # Update status with server.
+        resp = request(args.host, args.port, {
+            "type": "game_state",
+            "game_id": game_id,
+            "player_id": player_id,
+            "pos": player_pos,
+            "vel": None,
+        })
 
         """
         # Handle mouse drag
@@ -76,10 +89,11 @@ def game_loop():
 
             map_drawer.pos = click_window_pos - mouse_delta / scale
         """
-        map_drawer.pos = player.pos
+        map_drawer.pos = player_pos
 
+        # Render
         surface.fill((255, 255, 255))
         map_drawer.render(surface)
-        player.render(surface, map_drawer)
+        draw_player(surface, map_drawer, "cop", player_pos)
 
         pygame.display.update()
