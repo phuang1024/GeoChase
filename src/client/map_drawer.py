@@ -1,8 +1,8 @@
 import numpy as np
 import pygame
-from utils import *
-
 from constants import *
+
+from utils import *
 
 
 class MapDrawer:
@@ -16,6 +16,9 @@ class MapDrawer:
         self.osm = osm
         self.scale = 0.75 / COORDS_TO_MILES
         self.pos = np.array(self.osm.get_com())
+
+        self.roads_pos = self.pos.copy()
+        self.roads_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
 
         self.last_surface = None
 
@@ -31,38 +34,32 @@ class MapDrawer:
         road_surf = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
         road_surf.fill((255, 255, 255, 0))
 
-        font = pygame.font.SysFont("Arial", ROAD_WIDTH)
-
         for way in self.osm.ways:
-            if "addr:street" not in way.tags:
-                # Check if in screen bounds.
-                left, top = self.project(way.top, way.left)
-                right, bottom = self.project(way.bottom, way.right)
-                if right < 0 or left > WIDTH or top < 0 or bottom > HEIGHT:
-                    continue
+            if "addr:street" in way.tags:
+                continue
 
-                points = []
-                for node in way.nodes:
-                    points.append(self.project(node.lat, node.lon))
+            # Check if in screen bounds.
+            left, top = self.project(way.top, way.left)
+            right, bottom = self.project(way.bottom, way.right)
+            if right < 0 or left > WIDTH or top < 0 or bottom > HEIGHT:
+                continue
 
-                if (
-                    "highway" in way.tags
-                    and way.tags["highway"].lower().strip() in VALID_ROAD_TYPES
-                ):
-                    pygame.draw.lines(road_surf, (0, 0, 0, 80), False, points, ROAD_WIDTH)
-                else:
-                    pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
+            points = []
+            for node in way.nodes:
+                points.append(self.project(node.lat, node.lon))
+
+            if (
+                "highway" in way.tags
+                and way.tags["highway"].lower().strip() in VALID_ROAD_TYPES
+            ):
+                pygame.draw.lines(road_surf, (0, 0, 0, 80), False, points, ROAD_WIDTH)
             else:
-                # Draw street names
-                if np.random.rand() < STREET_NAME_CHANCE:
-                    text = font.render(way.tags["addr:street"], True, (0, 0, 0, 120))
-                    loc = (way.nodes[0].lat, way.nodes[0].lon)
-                    pos = self.project(*loc)
-                    surface.blit(text, pos)
+                pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
 
         road_surf = pygame.transform.box_blur(road_surf, 2)
-
         surface.blit(road_surf, (0, 0))
+
+        surface.blit(self.roads_surf, self.project(*self.roads_pos[::-1]))
 
         window.blit(surface, (0, 0))
 
@@ -80,6 +77,24 @@ class MapDrawer:
         px_pos = (coord_pos - self.pos) * scale + np.array([WIDTH / 2, HEIGHT / 2])
 
         return px_pos
+
+    def update_roads(self):
+        font = pygame.font.SysFont("Arial", ROAD_WIDTH)
+
+        self.roads_surf.fill((255, 255, 255, 0))
+
+        self.roads_pos = self.pos.copy()
+
+        for way in self.osm.ways:
+            if "addr:street" not in way.tags:
+                continue
+
+            if np.random.rand() < STREET_NAME_CHANCE:
+                text = font.render(way.tags["addr:street"], True, (0, 0, 0, 120))
+                loc = (way.nodes[0].lat, way.nodes[0].lon)
+                pos = self.project(*loc)
+                print(text, pos)
+                self.roads_surf.blit(text, pos)
 
     def force_road(self, loc, mvt) -> np.ndarray:
         """

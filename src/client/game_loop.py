@@ -43,6 +43,7 @@ def game_loop(args, game_id, player_id, player_type):
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     osm = metadata["osm"]
     map_drawer = MapDrawer(osm)
+    map_drawer.update_roads()
     if player_type == "heli":
         map_drawer.scale *= 2
 
