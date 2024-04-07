@@ -1,11 +1,7 @@
 import numpy as np
 import pygame
-from osm import OSM, parse_osm_file
 
-from utils import COORDS_TO_MILES
-
-WIDTH = 1280
-HEIGHT = 720
+from constants import *
 
 
 class Player:
