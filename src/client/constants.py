@@ -27,3 +27,11 @@ for i in range(VISIBILITY, 0, -1):
     opacity = np.interp(i, [0.8, VISIBILITY], [0, 255])
     opacity = min(max(int(opacity), 0), 255)
     pygame.draw.circle(VISIBILITY_MASK, (255, 255, 255, opacity), (WIDTH // 2, HEIGHT // 2), i)
+
+HELI_MASK = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+HELI_MASK.fill((255, 255, 255, 0))
+for i in range(300):
+    opacity = np.interp(i, [150, 300], [255, 0])
+    opacity = min(max(int(opacity), 0), 255)
+    pygame.draw.line(HELI_MASK, (255, 255, 255, opacity), (i, 0), (i, HEIGHT), 1)
+    pygame.draw.line(HELI_MASK, (255, 255, 255, opacity), (WIDTH - i, 0), (WIDTH - i, HEIGHT), 1)

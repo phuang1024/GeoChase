@@ -58,7 +58,7 @@ def get_session_id(args) -> tuple[str, str, str] | None:
             "osm": parse_osm_file("../../assets/big.osm"),
             "num_players": 2,
             "num_robbers": 1,
-            "num_helis": 1,
+            "num_helis": 0,
             "num_targets": 10,
         })
 
@@ -82,7 +82,7 @@ def wait_for_start(args, game_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=4570)
+    parser.add_argument("--port", type=int, default=4580)
     args = parser.parse_args()
 
     ret = get_session_id(args)
