@@ -9,7 +9,7 @@ from map_drawer import MapDrawer
 from osm import parse_osm_file
 from player import *
 
-STATUS_INTERVAL = 0.3
+STATUS_INTERVAL = 0.15
 
 
 def game_loop(args, game_id, player_id):
@@ -25,6 +25,7 @@ def game_loop(args, game_id, player_id):
     last_status_time = time.time()
 
     load_player_sprites()
+    #last_player_pos = {}
     other_players = []
 
     """
@@ -36,6 +37,8 @@ def game_loop(args, game_id, player_id):
     """
 
     while True:
+        time.sleep(0.01)
+
         time_delta = time.time() - last_time
         last_time = time.time()
 
@@ -72,16 +75,16 @@ def game_loop(args, game_id, player_id):
 
         # Update status with server.
         if time.time() - last_status_time > STATUS_INTERVAL:
-            last_status_time = time.time()
-
             resp = request(args.host, args.port, {
                 "type": "game_state",
                 "game_id": game_id,
                 "player_id": player_id,
                 "pos": player_pos,
-                "vel": None,
+                "vel": player_mvt,
             })
             other_players = resp["players"].values()
+
+            last_status_time = time.time()
 
         """
         # Handle mouse drag
@@ -105,9 +108,23 @@ def game_loop(args, game_id, player_id):
         map_drawer.render(surface)
 
         draw_player(surface, map_drawer, "cop", player_pos)
+
+        update_elapse = time.time() - last_status_time
+        #update_progress = update_elapse / STATUS_INTERVAL
         for player in other_players:
             if player.id == player_id:
                 continue
-            draw_player(surface, map_drawer, "cop", player.pos)
+
+            """
+            if player.id in last_player_pos:
+                pos = (last_player_pos[player.id] * (1 - update_progress) +
+                        (player.pos + player.vel * PLAYER_SPEED * STATUS_INTERVAL) * update_progress)
+            else:
+                pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
+            """
+
+            pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
+            draw_player(surface, map_drawer, "cop", pos)
+            #last_player_pos[player.id] = np.array(player.pos)
 
         pygame.display.update()
