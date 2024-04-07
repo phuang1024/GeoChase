@@ -4,10 +4,12 @@ import numpy as np
 import pygame
 
 from osm import OSM, parse_osm_file
+from player import Player, Cop, Robber
 
 WIDTH = 1280
 HEIGHT = 720
 
+# earth's circumference / 360
 COORDS_TO_MILES = 2 * math.pi * 3959 / 360
 
 
@@ -52,10 +54,12 @@ def game_loop():
     osm = parse_osm_file("../../assets/test.osm")
     map_drawer = MapDrawer(osm)
 
-    # Store state at mousedown.
+    player = Cop(osm.get_com())
+
+    # Store state at mousedown
     click_mouse_pos = None
     click_window_pos = None
-    # Updated every iter.
+    # Updated every iter
     last_mouse_pos = None
 
     while True:
@@ -73,6 +77,16 @@ def game_loop():
                     click_mouse_pos = np.array(event.pos)
                     click_window_pos = map_drawer.pos
 
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP]:
+            player.move_up()
+        if keys[pygame.K_DOWN]:
+            player.move_down()
+        if keys[pygame.K_LEFT]:
+            player.move_left()
+        if keys[pygame.K_RIGHT]:
+            player.move_right()
+
         # Handle mouse drag
         mouse_pressed = pygame.mouse.get_pressed()
         mouse_pos = np.array(pygame.mouse.get_pos())
@@ -87,4 +101,4 @@ def game_loop():
             map_drawer.pos = click_window_pos - mouse_delta / scale
 
         map_drawer.render(surface)
-        pygame.display.flip()
+        pygame.display.update()
