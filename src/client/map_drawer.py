@@ -17,7 +17,12 @@ class MapDrawer:
         self.scale = 1 / COORDS_TO_MILES
         self.pos = np.array(self.osm.get_com())
 
-    def render(self, window):
+    def render(self, window) -> pygame.Surface:
+        """
+        Draws on window in place.
+
+        Returns the shadow of roads (i.e. valid places to drive on).
+        """
         surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
         surface.fill((0, 0, 0, 0))
 
@@ -34,9 +39,11 @@ class MapDrawer:
 
             if "highway" in way.tags and way.tags["highway"].lower().strip() in VALID_ROAD_TYPES:
                 pygame.draw.lines(surface, (0, 0, 0, 80), False, points, 10)
-                pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
+            pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
 
         window.blit(surface, (0, 0))
+
+        return surface
 
     def project(self, lat, lon):
         # Pixels per coord

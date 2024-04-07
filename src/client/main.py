@@ -2,7 +2,7 @@ import argparse
 
 import time
 
-from display import game_loop
+from game_loop import game_loop
 from utils import *
 
 
