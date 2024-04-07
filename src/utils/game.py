@@ -1,5 +1,4 @@
 __all__ = (
-    "GameConfig",
     "Game",
     "Player",
 )
@@ -8,35 +7,50 @@ __all__ = (
 Classes relating to gameplay.
 """
 
-from dataclasses import dataclass
-
 import numpy as np
 
-from .map import Map
-
-
-@dataclass
-class GameConfig:
-    pass
+from .map import OSM
 
 
 class Game:
-    config: GameConfig
-    map: Map
+    osm: OSM
     players: dict[str, "Player"]
     num_players: int
+    num_robbers: int
+    num_helis: int
+    num_cops: int
+    alerts: list[str]
 
-    def __init__(self, num_players):
+    def __init__(self):
         self.players = {}
-        self.num_players = num_players
+        self.alerts = []
+
+    def num_players_of(self, type: str) -> int:
+        return sum(1 for player in self.players.values() if player.type == type)
+
+    def remaining_player_types(self) -> list[str]:
+        num_cops = self.num_players_of("cop")
+        num_helis = self.num_players_of("heli")
+        num_robbers = self.num_players_of("robber")
+        remain = []
+        for _ in range(self.num_robbers - num_robbers):
+            remain.append("robber")
+        for _ in range(self.num_helis - num_helis):
+            remain.append("heli")
+        for _ in range(self.num_cops - num_cops):
+            remain.append("cop")
+
+        return remain
 
 
 class Player:
     id: str
     pos: np.ndarray
     vel: np.ndarray
+    type: str
 
-    def __init__(self, id):
+    def __init__(self, id, type):
         self.pos = np.zeros(2)
         self.vel = np.zeros(2)
         self.id = id
+        self.type = type

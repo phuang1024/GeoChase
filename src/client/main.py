@@ -8,7 +8,7 @@ from game_loop import game_loop
 from utils import *
 
 
-def get_session_id(args) -> tuple[str, str] | None:
+def get_session_id(args) -> tuple[str, str, str] | None:
     """
     Uses CLI to either start or join game.
 
@@ -22,17 +22,30 @@ def get_session_id(args) -> tuple[str, str] | None:
 
     if choice == "1":
         print("Start game:")
-        num_players = int(input("Number of players: "))
-        resp = request(args.host, args.port, {"type": "new_game", "num_players": num_players})
-        print("  Game ID:", resp["game_id"])
-        return resp["game_id"], resp["player_id"]
+
+        osm_path = input("  Path to OSM file: ")
+        num_players = int(input("  Number of players: "))
+        num_robbers = int(input("  Number of robbers: "))
+        num_helis = int(input("  Number of helicopters: "))
+
+        osm = parse_osm_file(osm_path)
+        resp = request(args.host, args.port, {
+            "type": "new_game",
+            "osm": osm,
+            "num_players": num_players,
+            "num_robbers": num_robbers,
+            "num_helis": num_helis,
+        })
+
+        print("Game ID:", resp["game_id"])
+        return resp["game_id"], resp["player_id"], resp["type"]
 
     elif choice == "2":
         print("Join game:")
         game_id = input("  Game ID: ")
         resp = request(args.host, args.port, {"type": "join_game", "game_id": game_id})
         if resp["success"]:
-            return game_id, resp["player_id"]
+            return game_id, resp["player_id"], resp["type"]
         else:
             print("Invalid game ID.")
 
@@ -53,17 +66,17 @@ def wait_for_start(args, game_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=6645)
+    parser.add_argument("--port", type=int, default=4566)
     args = parser.parse_args()
 
     ret = get_session_id(args)
     if ret is None:
         return
 
-    game_id, player_id = ret
+    game_id, player_id, player_type = ret
     wait_for_start(args, game_id)
 
-    game_loop(args, game_id, player_id)
+    game_loop(args, game_id, player_id, player_type)
 
 
 if __name__ == "__main__":
