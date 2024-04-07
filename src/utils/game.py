@@ -10,6 +10,8 @@ Classes relating to gameplay.
 
 from dataclasses import dataclass
 
+import numpy as np
+
 from .map import Map
 
 
@@ -30,4 +32,9 @@ class Game:
 
 
 class Player:
-    pass
+    pos: np.ndarray
+    vel: np.ndarray
+
+    def __init__(self):
+        self.pos = np.zeros(2)
+        self.vel = np.zeros(2)

@@ -52,6 +52,14 @@ def handle_client(conn, addr):
         game = games[obj["game_id"]]
         send(conn, {"started": len(game.players) == game.num_players})
 
+    elif obj["type"] == "game_state":
+        game = games[obj["game_id"]]
+        player = game.players[obj["player_id"]]
+        player.pos = obj["pos"]
+        player.vel = obj["vel"]
+
+        send(conn, {"players": game.players})
+
 
 def main():
     parser = argparse.ArgumentParser()
