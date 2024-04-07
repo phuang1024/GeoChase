@@ -39,10 +39,6 @@ def handle_client(conn, addr):
 
         send(conn, {"game_id": game_id, "player_id": player_id})
 
-        if len(game.players) == game.num_players:
-            # Start game
-            pass
-
     elif obj["type"] == "join_game":
         game_id = obj["game_id"]
         if game_id not in games:
@@ -71,7 +67,17 @@ def handle_client(conn, addr):
         player.pos = obj["pos"]
         player.vel = obj["vel"]
 
-        send(conn, {"players": game.players})
+        send(conn, {"players": game.players, "alerts": game.alerts})
+
+        # Trigger false alert with probability.
+        if random.random() < 0.005:
+            road = game.osm.get_rand_road()
+            if "name" in road.tags:
+                game.alerts.append(f"Alert on: {road.tags['name']}")
+
+    elif obj["type"] == "add_alert":
+        game = games[obj["game_id"]]
+        game.alerts.append(obj["alert"])
 
 
 def main():

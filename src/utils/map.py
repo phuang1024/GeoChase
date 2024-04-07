@@ -67,11 +67,15 @@ class OSM:
         lon /= len(self.nodes)
         return lon, lat
 
-    def get_rand_pos(self):
+    def get_rand_road(self):
         while True:
             way = random.choice(self.ways)
             if way.tags["highway"] in VALID_ROAD_TYPES:
                 break
+        return way
+
+    def get_rand_pos(self):
+        way = self.get_rand_road()
         node = random.choice(way.nodes)
         return node.lon, node.lat
 

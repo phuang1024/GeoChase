@@ -17,9 +17,11 @@ class Game:
     players: dict[str, "Player"]
     num_players: int
     num_robbers: int
+    alerts: list[str]
 
     def __init__(self):
         self.players = {}
+        self.alerts = []
 
 
 class Player:

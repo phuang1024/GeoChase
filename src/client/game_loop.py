@@ -33,8 +33,8 @@ def get_mvt_input():
 
 def draw_info(surface, x, texts):
     for i, text in enumerate(texts):
-        text_surf = FONT.render(text, True, (128, 128, 128))
-        surface.blit(text_surf, (x, i * 22))
+        text_surf = FONT.render(text, True, (80, 80, 80))
+        surface.blit(text_surf, (x, i * 18 + 35))
 
 
 def game_loop(args, game_id, player_id):
@@ -49,9 +49,9 @@ def game_loop(args, game_id, player_id):
     last_time = time.time()
     time_delta = 0
     last_status_time = time.time()
+    status = None
 
     load_player_sprites()
-    other_players = []
 
     while True:
         time.sleep(0.01)
@@ -70,16 +70,14 @@ def game_loop(args, game_id, player_id):
         map_drawer.pos = player_pos
 
         # Update status with server.
-        if time.time() - last_status_time > STATUS_INTERVAL:
-            resp = request(args.host, args.port, {
+        if status is None or time.time() - last_status_time > STATUS_INTERVAL:
+            status = request(args.host, args.port, {
                 "type": "game_state",
                 "game_id": game_id,
                 "player_id": player_id,
                 "pos": player_pos,
                 "vel": player_mvt,
             })
-            other_players = resp["players"].values()
-
             last_status_time = time.time()
 
         # Render
@@ -89,7 +87,7 @@ def game_loop(args, game_id, player_id):
 
         # Draw other players
         update_elapse = time.time() - last_status_time
-        for player in other_players:
+        for player in status["players"].values():
             if player.id == player_id:
                 continue
 
@@ -106,5 +104,6 @@ def game_loop(args, game_id, player_id):
             f"Position: {player_pos[0]:.4f}, {player_pos[1]:.4f}",
             f"Velocity: {player_mvt[0]:.1f}, {player_mvt[1]:.1f}",
         ])
+        draw_info(surface, WIDTH - 300, status["alerts"])
 
         pygame.display.update()
