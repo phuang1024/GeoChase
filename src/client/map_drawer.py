@@ -17,8 +17,9 @@ class MapDrawer:
         self.scale = 1 / COORDS_TO_MILES
         self.pos = np.array(self.osm.get_com())
 
-    def render(self, surface):
-        surface.fill((255, 255, 255))
+    def render(self, window):
+        surface = pygame.Surface((WIDTH, HEIGHT), pygame.SRCALPHA)
+        surface.fill((0, 0, 0, 0))
 
         for way in self.osm.ways:
             # Check if in screen bounds.
@@ -30,9 +31,12 @@ class MapDrawer:
             points = []
             for node in way.nodes:
                 points.append(self.project(node.lat, node.lon))
-            pygame.draw.lines(surface, (0, 0, 0), False, points, 5)
 
-        return surface
+            if "highway" in way.tags and way.tags["highway"].lower().strip() in VALID_ROAD_TYPES:
+                pygame.draw.lines(surface, (0, 0, 0, 80), False, points, 10)
+                pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
+
+        window.blit(surface, (0, 0))
 
     def project(self, lat, lon):
         # Pixels per coord

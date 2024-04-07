@@ -6,3 +6,13 @@ HEIGHT = 720
 
 # earth's circumference / 360
 COORDS_TO_MILES = 2 * math.pi * 3959 / 360
+
+VALID_ROAD_TYPES = (
+    "motorway",
+    "trunk",
+    "primary",
+    "secondary",
+    "tertiary",
+    "residential",
+    "unclassified",
+)

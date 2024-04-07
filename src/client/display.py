@@ -20,11 +20,13 @@ def game_loop():
     last_time = time.time()
     time_delta = 0
 
+    """
     # Store state at mousedown
     click_mouse_pos = None
     click_window_pos = None
     # Updated every iter
     last_mouse_pos = None
+    """
 
     while True:
         time_delta = time.time() - last_time
@@ -36,6 +38,7 @@ def game_loop():
                 return
 
             if event.type == pygame.MOUSEBUTTONDOWN:
+                """
                 if event.button == 4:
                     map_drawer.scale *= 1.1
                 elif event.button == 5:
@@ -43,6 +46,7 @@ def game_loop():
                 elif event.button == 1:
                     click_mouse_pos = np.array(event.pos)
                     click_window_pos = map_drawer.pos
+                """
 
         keys = pygame.key.get_pressed()
         player_mvt = np.array([0, 0])
@@ -58,6 +62,7 @@ def game_loop():
             player_mvt = player_mvt / np.linalg.norm(player_mvt)
             player.pos += player_mvt * player.SPEED * time_delta
 
+        """
         # Handle mouse drag
         mouse_pressed = pygame.mouse.get_pressed()
         mouse_pos = np.array(pygame.mouse.get_pos())
@@ -70,7 +75,11 @@ def game_loop():
             scale = np.array([x_scale, -y_scale])
 
             map_drawer.pos = click_window_pos - mouse_delta / scale
+        """
+        map_drawer.pos = player.pos
 
+        surface.fill((255, 255, 255))
         map_drawer.render(surface)
         player.render(surface, map_drawer)
+
         pygame.display.update()
