@@ -12,17 +12,18 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .map import Map
+from .map import OSM
 
 
 @dataclass
 class GameConfig:
-    pass
+    num_players: int
+    num_robbers: int
+    osm: OSM
 
 
 class Game:
     config: GameConfig
-    map: Map
     players: dict[str, "Player"]
     num_players: int
 

@@ -1,12 +1,8 @@
-import math
-import time
-
 import numpy as np
 import pygame
-import pygame.gfxdraw
+from utils import *
 
 from constants import *
-from osm import OSM
 
 WIDTH = 1280
 HEIGHT = 720

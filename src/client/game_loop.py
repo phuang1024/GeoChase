@@ -2,11 +2,10 @@ import time
 
 import numpy as np
 import pygame
-from utils import request
+from utils import *
 
 from constants import *
 from map_drawer import MapDrawer
-from osm import parse_osm_file
 from player import *
 
 STATUS_INTERVAL = 0.15

@@ -1,7 +1,8 @@
 import numpy as np
 import pygame
+from utils import *
+
 from constants import *
-from osm import OSM
 
 
 class MapDrawer:
