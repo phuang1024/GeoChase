@@ -37,7 +37,7 @@ def draw_info(surface, x, texts):
         surface.blit(text_surf, (x, i * 18 + 35))
 
 
-def game_loop(args, game_id, player_id):
+def game_loop(args, game_id, player_id, player_type):
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
@@ -83,7 +83,7 @@ def game_loop(args, game_id, player_id):
         # Render
         surface.fill((255, 255, 255))
         map_drawer.render(surface)
-        draw_player(surface, map_drawer, "cop", player_pos)
+        draw_player(surface, map_drawer, player_type, player_pos)
 
         # Draw other players
         update_elapse = time.time() - last_status_time

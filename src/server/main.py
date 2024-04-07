@@ -26,28 +26,26 @@ def handle_client(conn, addr):
     if obj["type"] == "echo":
         send(conn, obj["echo"])
 
-    elif obj["type"] == "new_game":
-        game_id = generate_id()
-        games[game_id] = Game()
-        game = games[game_id]
+    elif obj["type"] in ("new_game", "join_game"):
+        if obj["type"] == "new_game":
+            game_id = generate_id()
+            games[game_id] = Game()
+            game = games[game_id]
+            game.osm = obj["osm"]
+            game.num_players = obj["num_players"]
+            game.num_robbers = obj["num_robbers"]
+        else:
+            game_id = obj["game_id"]
+            if game_id not in games:
+                send(conn, {"success": False})
+                return
+            game = games[game_id]
 
         player_id = generate_id()
-        game.players[player_id] = Player(player_id)
-        game.osm = obj["osm"]
-        game.num_players = obj["num_players"]
-        game.num_robbers = obj["num_robbers"]
+        player_type = random.choice(game.remaining_player_types())
+        game.players[player_id] = Player(player_id, player_type)
 
-        send(conn, {"game_id": game_id, "player_id": player_id})
-
-    elif obj["type"] == "join_game":
-        game_id = obj["game_id"]
-        if game_id not in games:
-            send(conn, {"success": False})
-            return
-
-        player_id = generate_id()
-        games[game_id].players[player_id] = Player(player_id)
-        send(conn, {"success": True, "player_id": player_id})
+        send(conn, {"success": True, "game_id": game_id, "player_id": player_id, "type": player_type})
 
     elif obj["type"] == "game_started":
         game = games[obj["game_id"]]
@@ -83,7 +81,7 @@ def handle_client(conn, addr):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=6645)
+    parser.add_argument("--port", type=int, default=1142)
     args = parser.parse_args()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

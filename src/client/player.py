@@ -35,4 +35,4 @@ def load_sprite(image: str):
 
 def load_player_sprites():
     SPRITES["cop"] = load_sprite("../../assets/cop.png")
-    #SPRITES["robber"] = load_sprite("../../assets/robber.png")
+    SPRITES["robber"] = load_sprite("../../assets/robber.png")
