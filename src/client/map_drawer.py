@@ -39,7 +39,8 @@ class MapDrawer:
 
             if "highway" in way.tags and way.tags["highway"].lower().strip() in VALID_ROAD_TYPES:
                 pygame.draw.lines(surface, (0, 0, 0, 80), False, points, 10)
-            pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
+            else:
+                pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
 
         window.blit(surface, (0, 0))
 
