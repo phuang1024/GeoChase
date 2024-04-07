@@ -14,7 +14,7 @@ class MapDrawer:
 
     def __init__(self, osm: OSM):
         self.osm = osm
-        self.scale = 1 / COORDS_TO_MILES
+        self.scale = 0.75 / COORDS_TO_MILES
         self.pos = np.array(self.osm.get_com())
 
         self.last_surface = None
