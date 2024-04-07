@@ -19,17 +19,17 @@ from .map import OSM
 class GameConfig:
     num_players: int
     num_robbers: int
-    osm: OSM
 
 
 class Game:
     config: GameConfig
+    osm: OSM
     players: dict[str, "Player"]
     num_players: int
+    num_robbers: int
 
-    def __init__(self, num_players):
+    def __init__(self):
         self.players = {}
-        self.num_players = num_players
 
 
 class Player:

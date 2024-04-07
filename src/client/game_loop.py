@@ -14,7 +14,8 @@ STATUS_INTERVAL = 0.15
 def game_loop(args, game_id, player_id):
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    osm = parse_osm_file("../../assets/small.osm")
+    metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
+    osm = metadata["osm"]
     map_drawer = MapDrawer(osm)
 
     player_pos = osm.get_com()

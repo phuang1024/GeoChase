@@ -28,12 +28,17 @@ def handle_client(conn, addr):
 
     elif obj["type"] == "new_game":
         game_id = generate_id()
-        games[game_id] = Game(obj["num_players"])
+        games[game_id] = Game()
+        game = games[game_id]
+
         player_id = generate_id()
-        games[game_id].players[player_id] = Player(player_id)
+        game.players[player_id] = Player(player_id)
+        game.osm = obj["osm"]
+        game.num_players = obj["num_players"]
+        game.num_robbers = obj["num_robbers"]
+
         send(conn, {"game_id": game_id, "player_id": player_id})
 
-        game = games[game_id]
         if len(game.players) == game.num_players:
             # Start game
             pass
@@ -51,6 +56,14 @@ def handle_client(conn, addr):
     elif obj["type"] == "game_started":
         game = games[obj["game_id"]]
         send(conn, {"started": len(game.players) == game.num_players})
+
+    elif obj["type"] == "game_metadata":
+        game = games[obj["game_id"]]
+        send(conn, {
+            "osm": game.osm,
+            "num_players": game.num_players,
+            "num_robbers": game.num_robbers,
+        })
 
     elif obj["type"] == "game_state":
         game = games[obj["game_id"]]

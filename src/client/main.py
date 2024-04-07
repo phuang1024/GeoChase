@@ -22,9 +22,20 @@ def get_session_id(args) -> tuple[str, str] | None:
 
     if choice == "1":
         print("Start game:")
-        num_players = int(input("Number of players: "))
-        resp = request(args.host, args.port, {"type": "new_game", "num_players": num_players})
-        print("  Game ID:", resp["game_id"])
+
+        osm_path = input("  Path to OSM file: ")
+        num_players = int(input("  Number of players: "))
+        num_robbers = int(input("  Number of robbers: "))
+
+        osm = parse_osm_file(osm_path)
+        resp = request(args.host, args.port, {
+            "type": "new_game",
+            "osm": osm,
+            "num_players": num_players,
+            "num_robbers": num_robbers,
+        })
+
+        print("Game ID:", resp["game_id"])
         return resp["game_id"], resp["player_id"]
 
     elif choice == "2":
