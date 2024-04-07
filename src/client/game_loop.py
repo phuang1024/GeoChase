@@ -131,4 +131,6 @@ def game_loop(args, game_id, player_id):
             draw_player(surface, map_drawer, "cop", pos)
             #last_player_pos[player.id] = np.array(player.pos)
 
+        surface.blit(VISIBILITY_MASK, (0, 0))
+
         pygame.display.update()
