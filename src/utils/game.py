@@ -20,10 +20,12 @@ class Game:
     num_helis: int
     num_cops: int
     alerts: list[str]
+    targets: list
 
     def __init__(self):
         self.players = {}
         self.alerts = []
+        self.targets = []
 
     def num_players_of(self, type: str) -> int:
         return sum(1 for player in self.players.values() if player.type == type)
@@ -41,6 +43,11 @@ class Game:
             remain.append("cop")
 
         return remain
+
+    def generate_targets(self, num_targets: int):
+        for _ in range(num_targets):
+            pos = self.osm.get_rand_pos()
+            self.targets.append(pos)
 
 
 class Player:

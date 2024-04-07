@@ -99,6 +99,11 @@ def game_loop(args, game_id, player_id, player_type):
             pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
             draw_player(surface, map_drawer, player.type, pos)
 
+        # Draw targets
+        if player_type == "robber":
+            for target in status["targets"]:
+                draw_player(surface, map_drawer, "target", target)
+
         # Visibility mask
         if player_type != "heli":
             surface.blit(VISIBILITY_MASK, (0, 0))

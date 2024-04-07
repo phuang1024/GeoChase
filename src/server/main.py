@@ -36,6 +36,7 @@ def handle_client(conn, addr):
             game.num_robbers = obj["num_robbers"]
             game.num_helis = obj["num_helis"]
             game.num_cops = game.num_players - game.num_robbers - game.num_helis
+            game.generate_targets(obj["num_targets"])
         else:
             game_id = obj["game_id"]
             if game_id not in games:
@@ -67,7 +68,11 @@ def handle_client(conn, addr):
         player.pos = obj["pos"]
         player.vel = obj["vel"]
 
-        send(conn, {"players": game.players, "alerts": game.alerts})
+        send(conn, {
+            "players": game.players,
+            "alerts": game.alerts,
+            "targets": game.targets,
+        })
 
         # Trigger false alert with probability.
         if random.random() < 0.005:
@@ -83,7 +88,7 @@ def handle_client(conn, addr):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=4566)
+    parser.add_argument("--port", type=int, default=4567)
     args = parser.parse_args()
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
