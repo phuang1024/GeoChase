@@ -109,8 +109,7 @@ def game_loop(args, game_id, player_id, player_type):
                 draw_player(surface, map_drawer, "target", target)
 
         # Visibility mask
-        if player_type != "heli":
-            surface.blit(VISIBILITY_MASK, (0, 0))
+        surface.blit(HELI_MASK if player_type == "heli" else VISIBILITY_MASK, (0, 0))
 
         # Info
         draw_info(surface, 30, [

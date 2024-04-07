@@ -76,7 +76,7 @@ def handle_client(conn, addr):
         })
 
         # Trigger false alert with probability.
-        if random.random() < 0.005:
+        if random.random() < 0.002:
             road = game.osm.get_rand_road()
             if "name" in road.tags:
                 game.alerts.append(f"Alert on: {road.tags['name']}")
