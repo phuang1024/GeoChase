@@ -12,7 +12,7 @@ from player import Cop, Player, Robber
 def game_loop():
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
-    osm = parse_osm_file("../../assets/small.osm")
+    osm = parse_osm_file("../../assets/test.osm")
     map_drawer = MapDrawer(osm)
 
     player = Cop(osm.get_com())
@@ -58,9 +58,13 @@ def game_loop():
             player_mvt[0] -= 1
         if keys[pygame.K_RIGHT]:
             player_mvt[0] += 1
+
         if player_mvt.any():
             player_mvt = player_mvt / np.linalg.norm(player_mvt)
-            player.pos += player_mvt * player.SPEED * time_delta
+        else:
+            player_mvt = np.array([0, 0])
+        player_mvt = player_mvt * player.SPEED * time_delta
+        player.pos = map_drawer.force_road(player.pos, player_mvt)
 
         """
         # Handle mouse drag
