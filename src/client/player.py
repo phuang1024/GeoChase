@@ -1,24 +1,22 @@
-import math
-
 import numpy as np
 import pygame
 from osm import OSM, parse_osm_file
 
+from utils import COORDS_TO_MILES
+
 WIDTH = 1280
 HEIGHT = 720
-
-COORDS_TO_MILES = 2 * math.pi * 3959 / 360
 
 
 class Player:
     SIZE = 50
-    SPEED = 1
+    SPEED = 5 / 1600 / COORDS_TO_MILES
 
     pos: np.ndarray
     """Center of display in lat, lon coords."""
 
     def __init__(self, start: np.ndarray, image: str):
-        self.pos = start
+        self.pos = np.array(start)
 
         img = pygame.image.load(image).convert_alpha()
         img_surf = pygame.transform.scale(img, (self.SIZE, self.SIZE))
@@ -33,21 +31,23 @@ class Player:
             2,
         )
 
-    def render(self, surface):
-        surface.blit(self.surface, self.pos)
+    def render(self, surface, map_drawer):
+        pixel_pos = map_drawer.project(*self.pos[::-1])
+        pixel_pos -= self.SIZE // 2
+        surface.blit(self.surface, pixel_pos)
         return surface
 
-    def move_up(self):
-        self.pos[1] -= self.SPEED
+    def move_up(self, time_delta):
+        self.pos[1] += self.SPEED * time_delta
 
-    def move_down(self):
-        self.pos[1] += self.SPEED
+    def move_down(self, time_delta):
+        self.pos[1] -= self.SPEED * time_delta
 
-    def move_left(self):
-        self.pos[0] -= self.SPEED
+    def move_left(self, time_delta):
+        self.pos[0] -= self.SPEED * time_delta
 
-    def move_right(self):
-        self.pos[0] += self.SPEED
+    def move_right(self, time_delta):
+        self.pos[0] += self.SPEED * time_delta
 
 
 class Cop(Player):
