@@ -56,7 +56,7 @@ class MapDrawer:
             else:
                 pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
 
-        road_surf = pygame.transform.box_blur(road_surf, 2)
+        road_surf = pygame.transform.box_blur(road_surf, 3)
         surface.blit(road_surf, (0, 0))
 
         if road_names:
@@ -81,7 +81,8 @@ class MapDrawer:
         return px_pos
 
     def update_roads(self):
-        font = pygame.font.SysFont("Arial", ROAD_WIDTH, True)
+        street_font = pygame.font.SysFont("Arial", ROAD_WIDTH, True)
+        amenity_font = pygame.font.SysFont("Arial", int(ROAD_WIDTH*1.6), True)
 
         self.roads_surf.fill((255, 255, 255, 0))
 
@@ -92,7 +93,7 @@ class MapDrawer:
                 continue
 
             if np.random.rand() < STREET_NAME_CHANCE:
-                text = font.render(way.tags["addr:street"], True, (0, 0, 0, 120))
+                text = street_font.render(way.tags["addr:street"], True, (0, 0, 0, 120))
                 n1 = way.nodes[0]
                 # n2 = way.nodes[min(int(text.get_width() / 25), len(way.nodes) - 1)]
                 n2 = way.nodes[1]
@@ -109,6 +110,19 @@ class MapDrawer:
                 text = pygame.transform.rotate(text, angle)
                 node1 -= np.array([text.get_width() / 2, text.get_height() / 2])
                 self.roads_surf.blit(text, node1)
+
+            if "amenity" in way.tags and "name" in way.tags:
+                if not way.tags["name"].isalnum():
+                    continue
+                average = np.array([0.0, 0.0])
+                for node in way.nodes:
+                    average += np.array([node.lon, node.lat])
+                average /= len(way.nodes)
+
+                text = amenity_font.render(way.tags["name"], True, (0, 0, 0, 120))
+                node = self.project(average[1], average[0])
+                node -= np.array([text.get_width() / 2, text.get_height() / 2])
+                self.roads_surf.blit(text, node)
 
     def force_road(self, loc, mvt) -> np.ndarray:
         """
