@@ -26,6 +26,7 @@ def get_session_id(args) -> tuple[str, str, str] | None:
         osm_path = input("  Path to OSM file: ")
         num_players = int(input("  Number of players: "))
         num_robbers = int(input("  Number of robbers: "))
+        num_helis = int(input("  Number of helicopters: "))
 
         osm = parse_osm_file(osm_path)
         resp = request(args.host, args.port, {
@@ -33,6 +34,7 @@ def get_session_id(args) -> tuple[str, str, str] | None:
             "osm": osm,
             "num_players": num_players,
             "num_robbers": num_robbers,
+            "num_helis": num_helis,
         })
 
         print("Game ID:", resp["game_id"])
@@ -64,7 +66,7 @@ def wait_for_start(args, game_id):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--host", type=str, default="")
-    parser.add_argument("--port", type=int, default=1142)
+    parser.add_argument("--port", type=int, default=4566)
     args = parser.parse_args()
 
     ret = get_session_id(args)

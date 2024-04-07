@@ -17,6 +17,8 @@ class Game:
     players: dict[str, "Player"]
     num_players: int
     num_robbers: int
+    num_helis: int
+    num_cops: int
     alerts: list[str]
 
     def __init__(self):
@@ -28,11 +30,14 @@ class Game:
 
     def remaining_player_types(self) -> list[str]:
         num_cops = self.num_players_of("cop")
+        num_helis = self.num_players_of("heli")
         num_robbers = self.num_players_of("robber")
         remain = []
         for _ in range(self.num_robbers - num_robbers):
             remain.append("robber")
-        for _ in range(self.num_players - self.num_robbers - num_cops):
+        for _ in range(self.num_helis - num_helis):
+            remain.append("heli")
+        for _ in range(self.num_cops - num_cops):
             remain.append("cop")
 
         return remain

@@ -43,6 +43,8 @@ def game_loop(args, game_id, player_id, player_type):
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     osm = metadata["osm"]
     map_drawer = MapDrawer(osm)
+    if player_type == "heli":
+        map_drawer.scale *= 2
 
     player_pos = osm.get_rand_pos()
 
@@ -66,7 +68,10 @@ def game_loop(args, game_id, player_id, player_type):
 
         # Handle user movement.
         player_mvt = get_mvt_input()
-        player_pos = map_drawer.force_road(player_pos, player_mvt * PLAYER_SPEED * time_delta)
+        if player_type == "heli":
+            player_pos += player_mvt * PLAYER_SPEED * time_delta * 2
+        else:
+            player_pos = map_drawer.force_road(player_pos, player_mvt * PLAYER_SPEED * time_delta)
         map_drawer.pos = player_pos
 
         # Update status with server.
@@ -92,10 +97,11 @@ def game_loop(args, game_id, player_id, player_type):
                 continue
 
             pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
-            draw_player(surface, map_drawer, "cop", pos)
+            draw_player(surface, map_drawer, player.type, pos)
 
         # Visibility mask
-        surface.blit(VISIBILITY_MASK, (0, 0))
+        if player_type != "heli":
+            surface.blit(VISIBILITY_MASK, (0, 0))
 
         # Info
         draw_info(surface, 30, [
