@@ -11,6 +11,32 @@ from player import *
 STATUS_INTERVAL = 0.15
 
 
+def get_mvt_input():
+    keys = pygame.key.get_pressed()
+    player_mvt = np.array([0, 0])
+    if keys[pygame.K_UP]:
+        player_mvt[1] += 1
+    if keys[pygame.K_DOWN]:
+        player_mvt[1] -= 1
+    if keys[pygame.K_LEFT]:
+        player_mvt[0] -= 1
+    if keys[pygame.K_RIGHT]:
+        player_mvt[0] += 1
+
+    if player_mvt.any():
+        player_mvt = player_mvt / np.linalg.norm(player_mvt)
+    else:
+        player_mvt = np.array([0, 0])
+
+    return player_mvt
+
+
+def draw_info(surface, x, texts):
+    for i, text in enumerate(texts):
+        text_surf = FONT.render(text, True, (128, 128, 128))
+        surface.blit(text_surf, (x, i * 22))
+
+
 def game_loop(args, game_id, player_id):
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
 
@@ -25,16 +51,7 @@ def game_loop(args, game_id, player_id):
     last_status_time = time.time()
 
     load_player_sprites()
-    #last_player_pos = {}
     other_players = []
-
-    """
-    # Store state at mousedown
-    click_mouse_pos = None
-    click_window_pos = None
-    # Updated every iter
-    last_mouse_pos = None
-    """
 
     while True:
         time.sleep(0.01)
@@ -47,35 +64,10 @@ def game_loop(args, game_id, player_id):
                 pygame.quit()
                 return
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                """
-                if event.button == 4:
-                    map_drawer.scale *= 1.1
-                elif event.button == 5:
-                    map_drawer.scale /= 1.1
-                elif event.button == 1:
-                    click_mouse_pos = np.array(event.pos)
-                    click_window_pos = map_drawer.pos
-                """
-
         # Handle user movement.
-        keys = pygame.key.get_pressed()
-        player_mvt = np.array([0, 0])
-        if keys[pygame.K_UP]:
-            player_mvt[1] += 1
-        if keys[pygame.K_DOWN]:
-            player_mvt[1] -= 1
-        if keys[pygame.K_LEFT]:
-            player_mvt[0] -= 1
-        if keys[pygame.K_RIGHT]:
-            player_mvt[0] += 1
-
-        if player_mvt.any():
-            player_mvt = player_mvt / np.linalg.norm(player_mvt)
-        else:
-            player_mvt = np.array([0, 0])
-        player_mvt = player_mvt * PLAYER_SPEED * time_delta
-        player_pos = map_drawer.force_road(player_pos, player_mvt)
+        player_mvt = get_mvt_input()
+        player_pos = map_drawer.force_road(player_pos, player_mvt * PLAYER_SPEED * time_delta)
+        map_drawer.pos = player_pos
 
         # Update status with server.
         if time.time() - last_status_time > STATUS_INTERVAL:
@@ -90,47 +82,29 @@ def game_loop(args, game_id, player_id):
 
             last_status_time = time.time()
 
-        """
-        # Handle mouse drag
-        mouse_pressed = pygame.mouse.get_pressed()
-        mouse_pos = np.array(pygame.mouse.get_pos())
-        if mouse_pressed[0] and (mouse_pos != last_mouse_pos).any():
-            mouse_delta = mouse_pos - click_mouse_pos
-
-            # Pixels per coord
-            y_scale = HEIGHT / map_drawer.scale
-            x_scale = y_scale / map_drawer.osm.stretch_factor
-            scale = np.array([x_scale, -y_scale])
-
-            map_drawer.pos = click_window_pos - mouse_delta / scale
-        """
-        map_drawer.pos = player_pos
-
         # Render
         surface.fill((255, 255, 255))
-
         map_drawer.render(surface)
-
         draw_player(surface, map_drawer, "cop", player_pos)
 
+        # Draw other players
         update_elapse = time.time() - last_status_time
-        #update_progress = update_elapse / STATUS_INTERVAL
         for player in other_players:
             if player.id == player_id:
                 continue
 
-            """
-            if player.id in last_player_pos:
-                pos = (last_player_pos[player.id] * (1 - update_progress) +
-                        (player.pos + player.vel * PLAYER_SPEED * STATUS_INTERVAL) * update_progress)
-            else:
-                pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
-            """
-
             pos = player.pos + player.vel * PLAYER_SPEED * update_elapse
             draw_player(surface, map_drawer, "cop", pos)
-            #last_player_pos[player.id] = np.array(player.pos)
 
+        # Visibility mask
         surface.blit(VISIBILITY_MASK, (0, 0))
+
+        # Info
+        draw_info(surface, 30, [
+            f"Num players: {metadata['num_players']}",
+            f"Num robbers: {metadata['num_robbers']}",
+            f"Position: {player_pos[0]:.4f}, {player_pos[1]:.4f}",
+            f"Velocity: {player_mvt[0]:.1f}, {player_mvt[1]:.1f}",
+        ])
 
         pygame.display.update()
