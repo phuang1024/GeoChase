@@ -85,8 +85,8 @@ def handle_client(conn, addr, games):
             target = game.targets.pop(key)
             road = target.street
             if "name" in road.tags:
-                game.alerts.append(f"Alert on: {target.street.tags['name']}")
+                game.alerts.append(f"{target.street.tags['name']}")
             else:
-                game.alerts.append("Alert on: Unknown")
+                game.alerts.append("Unknown")
 
         send(conn, {"success": True})

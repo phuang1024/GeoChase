@@ -8,7 +8,7 @@ from constants import *
 from map_drawer import MapDrawer
 from player import *
 
-STATUS_INTERVAL = 0.15
+STATUS_INTERVAL = 0.25
 
 
 def get_mvt_input():
@@ -33,12 +33,14 @@ def get_mvt_input():
 
 def draw_info(surface, x, texts):
     for i, text in enumerate(texts):
-        text_surf = FONT.render(text, True, (80, 80, 80))
+        text_surf = FONT.render(text, True, (60, 100, 60))
         surface.blit(text_surf, (x, i * 18 + 35))
 
 
 def game_loop(args, game_id, player_id, player_type):
     surface = pygame.display.set_mode((WIDTH, HEIGHT))
+    pygame.display.set_caption("GeoChase")
+    pygame.display.set_icon(pygame.image.load("../../assets/target.png"))
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     osm = metadata["osm"]
@@ -54,6 +56,9 @@ def game_loop(args, game_id, player_id, player_type):
     time_delta = 0
     last_status_time = time.time()
     status = None
+
+    road_names = False
+    info_style = 1
 
     load_player_sprites()
 
@@ -71,6 +76,10 @@ def game_loop(args, game_id, player_id, player_type):
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and player_type == "robber":
                     request(args.host, args.port, {"type": "rob", "game_id": game_id, "pos": player_pos})
+                elif event.key == pygame.K_n:
+                    road_names = not road_names
+                elif event.key == pygame.K_i:
+                    info_style = (info_style + 1) % 3
 
         # Handle user movement.
         player_mvt = get_mvt_input()
@@ -99,7 +108,7 @@ def game_loop(args, game_id, player_id, player_type):
 
         # Render
         surface.fill((255, 255, 255))
-        map_drawer.render(surface, int(ROAD_WIDTH / 2) if player_type in ("heli", "spectator") else ROAD_WIDTH)
+        map_drawer.render(surface, int(ROAD_WIDTH / 2) if player_type in ("heli", "spectator") else ROAD_WIDTH, road_names=road_names)
         draw_player(surface, map_drawer, player_type, player_pos)
 
         # Draw other players
@@ -126,12 +135,19 @@ def game_loop(args, game_id, player_id, player_type):
             surface.blit(HELI_MASK if player_type == "heli" else VISIBILITY_MASK, (0, 0))
 
         # Info
-        draw_info(surface, 30, [
-            f"Robbers: {metadata['num_robbers']}",
-            f"Remaining targets: {len(status['targets'])}",
-            f"Position: {player_pos[0]:.4f}, {player_pos[1]:.4f}",
-            f"Velocity: {player_mvt[0]:.1f}, {player_mvt[1]:.1f}",
-        ])
-        draw_info(surface, WIDTH - 300, status["alerts"])
+        if info_style != 0:
+            if info_style == 2:
+                rect = pygame.Surface((300, HEIGHT), pygame.SRCALPHA)
+                rect.fill((220, 255, 220, 160))
+                surface.blit(rect, (WIDTH - 300, 0))
+                surface.blit(rect, (0, 0))
+
+            draw_info(surface, 30, [
+                f"Robbers: {metadata['num_robbers']}",
+                f"Targets: {len(status['targets'])}",
+                f"Pos: {player_pos[0]:.4f}, {player_pos[1]:.4f}",
+                f"Vel: {player_mvt[0]:.1f}, {player_mvt[1]:.1f}",
+            ])
+            draw_info(surface, WIDTH - 300, status["alerts"])
 
         pygame.display.update()

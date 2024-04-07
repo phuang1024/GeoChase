@@ -9,7 +9,7 @@ def update_game(game):
     if random.random() < 0.004:
         road = game.osm.get_rand_road()
         if "name" in road.tags:
-            game.alerts.append(f"Alert on: {road.tags['name']}")
+            game.alerts.append(f"{road.tags['name']}")
 
     # Check if robber is captured.
     robbers = [x for x in game.players.values() if x.type == "robber"]

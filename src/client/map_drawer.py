@@ -22,7 +22,7 @@ class MapDrawer:
 
         self.last_surface = None
 
-    def render(self, window, road_width=ROAD_WIDTH) -> pygame.Surface:
+    def render(self, window, road_width=ROAD_WIDTH, road_names=True) -> pygame.Surface:
         """
         Draws on window in place.
 
@@ -59,8 +59,9 @@ class MapDrawer:
         road_surf = pygame.transform.box_blur(road_surf, 2)
         surface.blit(road_surf, (0, 0))
 
-        roads_pos = self.project(*self.roads_pos[::-1])
-        surface.blit(self.roads_surf, roads_pos - np.array([WIDTH / 2, HEIGHT / 2]))
+        if road_names:
+            roads_pos = self.project(*self.roads_pos[::-1])
+            surface.blit(self.roads_surf, roads_pos - np.array([WIDTH / 2, HEIGHT / 2]))
 
         window.blit(surface, (0, 0))
 
