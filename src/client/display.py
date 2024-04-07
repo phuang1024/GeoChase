@@ -30,7 +30,7 @@ class MapDrawer:
             points = []
             for node in way.nodes:
                 points.append(self.project(node.lat, node.lon))
-            pygame.draw.lines(surface, (0, 0, 0), False, points)
+            pygame.draw.lines(surface, (0, 0, 0), False, points, 5)
 
         return surface
 
