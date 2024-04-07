@@ -22,7 +22,7 @@ class MapDrawer:
 
         self.last_surface = None
 
-    def render(self, window) -> pygame.Surface:
+    def render(self, window, road_width=ROAD_WIDTH) -> pygame.Surface:
         """
         Draws on window in place.
 
@@ -52,7 +52,7 @@ class MapDrawer:
                 "highway" in way.tags
                 and way.tags["highway"].lower().strip() in VALID_ROAD_TYPES
             ):
-                pygame.draw.lines(road_surf, (0, 0, 0, 80), False, points, ROAD_WIDTH)
+                pygame.draw.lines(road_surf, (0, 0, 0, 80), False, points, road_width)
             else:
                 pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
 

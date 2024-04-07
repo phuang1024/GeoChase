@@ -98,7 +98,7 @@ def game_loop(args, game_id, player_id, player_type):
 
         # Render
         surface.fill((255, 255, 255))
-        map_drawer.render(surface)
+        map_drawer.render(surface, int(ROAD_WIDTH / 2) if player_type in ("heli", "spectator") else ROAD_WIDTH)
         draw_player(surface, map_drawer, player_type, player_pos)
 
         # Draw other players
