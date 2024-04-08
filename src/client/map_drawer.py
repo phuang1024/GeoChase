@@ -112,7 +112,7 @@ class MapDrawer:
                 self.roads_surf.blit(text, node1)
 
             if "amenity" in way.tags and "name" in way.tags:
-                if not way.tags["name"].isalnum():
+                if not way.tags["name"].strip().replace(" ", "").isalnum():
                     continue
                 average = np.array([0.0, 0.0])
                 for node in way.nodes:
