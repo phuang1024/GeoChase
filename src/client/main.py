@@ -4,7 +4,7 @@ import time
 import pygame
 pygame.init()
 
-from game_loop import game_loop
+from gui.main import game_loop
 from utils import *
 
 
@@ -56,10 +56,10 @@ def get_session_id(args) -> tuple[str, str, str] | None:
         resp = request(args.host, args.port, {
             "type": "new_game",
             "osm": parse_osm_file("../../assets/big.osm"),
-            "num_players": 2,
+            "num_players": 1,
             "num_robbers": 1,
             "num_helis": 0,
-            "num_targets": 10,
+            "num_targets": 15,
         })
 
         print("Game ID:", resp["game_id"])

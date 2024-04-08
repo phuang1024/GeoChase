@@ -1,3 +1,7 @@
+"""
+GUI (pygame) main game loop.
+"""
+
 import time
 
 import numpy as np
@@ -5,8 +9,8 @@ import pygame
 from utils import *
 
 from constants import *
-from map_drawer import MapDrawer
-from player import *
+from gui.map_drawer import MapDrawer
+from gui.player import *
 
 STATUS_INTERVAL = 0.25
 
