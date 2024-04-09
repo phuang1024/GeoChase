@@ -67,7 +67,7 @@ class OSM:
             lon += node.lon
         lat /= len(self.nodes)
         lon /= len(self.nodes)
-        return lon, lat
+        return np.array((lon, lat))
 
     def get_rand_road(self):
         while True:

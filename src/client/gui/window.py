@@ -57,9 +57,12 @@ class ViewWindow:
         return self.pos - self.size / 2
 
     def coord_to_px(self, coord: np.ndarray) -> np.ndarray:
-        return (coord - self.top_left) * self.scale
+        px = (coord - self.top_left) * self.scale
+        px[..., 1] = self.height - px[..., 1]
+        return px
 
     def px_to_coord(self, px: np.ndarray) -> np.ndarray:
+        px[..., 1] = self.height - px[..., 1]
         return px / self.scale + self.top_left
 
 
@@ -72,6 +75,7 @@ class Window:
             osm.get_com(),
             1280,
             720,
+            osm.stretch_factor,
         )
 
         self.surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
@@ -81,3 +85,6 @@ class Window:
             if event.type == pygame.VIDEORESIZE:
                 self.view_window.width = event.w
                 self.view_window.height = event.h
+
+        self.view_window.pos[0] += 0.0001
+        print(self.view_window.pos)
