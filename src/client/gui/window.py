@@ -75,8 +75,33 @@ class Window:
             osm.stretch_factor,
         )
 
+        # Used for click and drag.
+        self.drag_data = {
+            "init_mouse_pos": None,
+            "init_window_pos": None,
+        }
+
     def update(self, events):
         for event in events:
             if event.type == pygame.VIDEORESIZE:
                 self.view_window.width = event.w
                 self.view_window.height = event.h
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 4:
+                    self.view_window.y_size *= 1.1
+                elif event.button == 5:
+                    self.view_window.y_size /= 1.1
+
+                elif event.button == 1:
+                    self.drag_data["init_mouse_pos"] = np.array(event.pos)
+                    self.drag_data["init_window_pos"] = self.view_window.pos.copy()
+
+        mouse_pressed = pygame.mouse.get_pressed()
+        mouse_pos = np.array(pygame.mouse.get_pos())
+
+        if mouse_pressed[0]:
+            if self.drag_data["init_mouse_pos"] is not None:
+                delta = (mouse_pos - self.drag_data["init_mouse_pos"]) / self.view_window.scale
+                delta[1] *= -1
+                self.view_window.pos = self.drag_data["init_window_pos"] - delta
