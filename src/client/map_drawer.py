@@ -59,13 +59,13 @@ class MapDrawer:
         road_surf = pygame.transform.box_blur(road_surf, 3)
         surface.blit(road_surf, (0, 0))
 
+        self.last_surface = surface
+
         if road_names:
             roads_pos = self.project(*self.roads_pos[::-1])
             surface.blit(self.roads_surf, roads_pos - np.array([WIDTH / 2, HEIGHT / 2]))
 
         window.blit(surface, (0, 0))
-
-        self.last_surface = surface
 
         return surface
 
@@ -112,7 +112,7 @@ class MapDrawer:
                 self.roads_surf.blit(text, node1)
 
             if "amenity" in way.tags and "name" in way.tags:
-                if not way.tags["name"].isalnum():
+                if not way.tags["name"].strip().replace(" ", "").isalnum():
                     continue
                 average = np.array([0.0, 0.0])
                 for node in way.nodes:
