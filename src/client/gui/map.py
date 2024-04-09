@@ -21,11 +21,16 @@ class MapDrawer:
                 continue
 
             # Check if in screen bounds.
-            if way.right < view_bounds[0] or way.left > view_bounds[2] or way.top < view_bounds[3] or way.bottom > view_bounds[1]:
+            if (
+                    way.right_bottom[0] < view_bounds[0]
+                    or way.left_top[0] > view_bounds[2]
+                    or way.right_bottom[1] < view_bounds[3]
+                    or way.left_top[1] > view_bounds[1]
+                ):
                 continue
 
             # Draw lines
-            points = view.coord_to_px(way.points)
+            points = view.coord_to_px(way.nodes)
             pygame.draw.lines(surface, (0, 0, 0, 255), False, points, 1)
 
         return surface

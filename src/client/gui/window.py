@@ -72,7 +72,7 @@ class Window:
     def __init__(self, osm: OSM):
         self.view_window = ViewWindow(
             0.75 / COORDS_TO_MILES,
-            osm.get_com(),
+            osm.com,
             1280,
             720,
             osm.stretch_factor,
