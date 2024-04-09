@@ -38,18 +38,15 @@ class OSM:
     #nodes: dict[int, Node]
     ways: list[Way]
 
-    com: np.ndarray
-    """Center of mass (coords) of the map."""
-    stretch_factor: float = 1
-    """secant(avg_lat)"""
+    stretch_factor: float
+    """secant(avg_lat) to compensate for lines of longitude converging."""
 
-    # lat and lon bounds
-    """
-    top: float
-    left: float
-    bottom: float
-    right: float
-    """
+    left_top: np.ndarray
+    """Shape (2). Top-left corner of the bounding box."""
+    right_bottom: np.ndarray
+    """Shape (2). Bottom-right corner of the bounding box."""
+    center: np.ndarray
+    """Center (coords) of the map."""
 
     def get_rand_road(self) -> Way:
         while True:
@@ -76,8 +73,8 @@ def parse_osm_file(path):
 def parse_osm(root):
     node_locs = {}
     ways = []
-    com = np.zeros(2)
-    com_n = 0
+    left_top = np.array([float("inf"), float("inf")])
+    right_bottom = np.array([-float("inf"), -float("inf")])
 
     for child in root:
         if child.tag == "node":
@@ -97,22 +94,25 @@ def parse_osm(root):
                     tags[subchild.attrib["k"]] = subchild.attrib["v"]
             way_locs = np.array(way_locs)
 
-            if "highway" in tags or "addr:street" in tags:
-                ways.append(Way(
+            if "highway" in tags:# or "addr:street" in tags:
+                way = Way(
                     nodes=way_locs,
                     left_top=np.min(way_locs, axis=0),
                     right_bottom=np.max(way_locs, axis=0),
                     tags=tags,
-                ))
-                com += np.sum(way_locs, axis=0)
-                com_n += way_locs.shape[0]
+                )
+                ways.append(way)
 
-    com /= com_n
-    # TODO explain this
-    stretch = 1 / np.cos(np.radians(com[1]))
+                left_top = np.minimum(left_top, way.left_top)
+                right_bottom = np.maximum(right_bottom, way.right_bottom)
+
+    center = (left_top + right_bottom) / 2
+    stretch = 1 / np.cos(np.radians(center[1]))
 
     return OSM(
         ways=ways,
-        com=com,
         stretch_factor=stretch,
+        left_top=left_top,
+        right_bottom=right_bottom,
+        center=center,
     )

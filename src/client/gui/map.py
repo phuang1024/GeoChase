@@ -17,6 +17,7 @@ class MapDrawer:
         view_bounds = view.px_to_coord(np.array([[0, 0], view.resolution])).flatten()
 
         for way in osm.ways:
+            # Don't draw buildings.
             if "addr:street" in way.tags:
                 continue
 
