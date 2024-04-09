@@ -8,6 +8,9 @@ from dataclasses import dataclass
 import numpy as np
 import pygame
 
+from constants import *
+from utils import *
+
 
 @dataclass
 class ViewWindow:
@@ -63,15 +66,15 @@ class ViewWindow:
 class Window:
     view_window: ViewWindow
 
-    def __init__(self):
+    def __init__(self, osm: OSM):
         self.view_window = ViewWindow(
-            0.75,
-            np.array([0, 0]),
+            0.75 / COORDS_TO_MILES,
+            osm.get_com(),
             1280,
             720,
         )
 
-        self.display = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+        self.surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
     def update(self, events):
         for event in events:
