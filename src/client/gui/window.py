@@ -1,6 +1,5 @@
 """
 Handles scalable, resizable view window of the full OSM.
-Wrapper around pygame display.
 """
 
 from dataclasses import dataclass
@@ -67,8 +66,6 @@ class ViewWindow:
 
 
 class Window:
-    view_window: ViewWindow
-
     def __init__(self, osm: OSM):
         self.view_window = ViewWindow(
             0.75 / COORDS_TO_MILES,
@@ -78,13 +75,8 @@ class Window:
             osm.stretch_factor,
         )
 
-        self.surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
-
     def update(self, events):
         for event in events:
             if event.type == pygame.VIDEORESIZE:
                 self.view_window.width = event.w
                 self.view_window.height = event.h
-
-        self.view_window.pos[0] += 0.0001
-        print(self.view_window.pos)

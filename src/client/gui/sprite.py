@@ -1,14 +1,22 @@
-import numpy as np
+"""
+Draws player sprites.
+"""
+
+__all__ = (
+    "SPRITES",
+    "draw_sprite",
+    "load_player_sprites",
+)
+
 import pygame
 
 from constants import *
 
 SIZE = 50
-SPRITES = {
-}
+SPRITES = {}
 
 
-def draw_player(surface, map_drawer, type, pos):
+def draw_sprite(surface, map_drawer, type, pos):
     if type == "spectator":
         return
 
@@ -37,7 +45,5 @@ def load_sprite(image: str):
 
 
 def load_player_sprites():
-    SPRITES["cop"] = load_sprite("../../assets/cop.png")
-    SPRITES["robber"] = load_sprite("../../assets/robber.png")
-    SPRITES["heli"] = load_sprite("../../assets/heli.png")
-    SPRITES["target"] = load_sprite("../../assets/target.png")
+    for name in ("cop", "robber", "heli", "target"):
+        SPRITES[name] = load_sprite(f"../../assets/{name}.png")

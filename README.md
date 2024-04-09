@@ -24,6 +24,4 @@ Communication between like player types is encouraged.
 
 Hotkeys:
 
-- As a robber, `r` takes a target within proximity.
-- `n` toggles road names.
-- `i` toggles info display.
+TODO

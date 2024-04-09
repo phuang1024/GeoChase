@@ -6,7 +6,7 @@ import numpy as np
 import pygame
 
 from gui.window import ViewWindow
-from utils.map import OSM
+from utils import *
 
 
 class MapDrawer:
@@ -28,6 +28,9 @@ class MapDrawer:
                     or way.right_bottom[1] < view_bounds[3]
                     or way.left_top[1] > view_bounds[1]
                 ):
+                continue
+
+            if way.tags.get("highway", None) not in VALID_ROAD_TYPES:
                 continue
 
             # Draw lines
