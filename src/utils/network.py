@@ -60,8 +60,13 @@ def request(ip, port, obj):
 
     Used client-side.
     """
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.connect((ip, port))
+    while True:
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((ip, port))
+            break
+        except:
+            pass
     send(sock, obj)
     response = recv(sock)
     sock.close()
