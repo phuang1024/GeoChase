@@ -36,6 +36,7 @@ class Way:
     id: int
     nodes: list[Node]
     tags: dict[str, str]
+    points: np.ndarray
 
     # lat and lon bounds
     top: float = float("inf")
@@ -125,14 +126,19 @@ def parse_osm(root):
         elif child.tag == "way":
             way = Way(
                 id=int(child.attrib["id"]),
+                points=None,
                 nodes=[],
                 tags={},
             )
+            points = []
             for subchild in child:
                 if subchild.tag == "nd":
-                    way.nodes.append(nodes[int(subchild.attrib["ref"])])
+                    node = nodes[int(subchild.attrib["ref"])]
+                    way.nodes.append(node)
+                    points.append([node.lon, node.lat])
                 elif subchild.tag == "tag":
                     way.tags[subchild.attrib["k"]] = subchild.attrib["v"]
+            way.points = np.array(points)
 
             way.top = min(node.lat for node in way.nodes)
             way.left = min(node.lon for node in way.nodes)
