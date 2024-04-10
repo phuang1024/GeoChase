@@ -27,6 +27,7 @@ def main(args, game_id, player_id):
     pygame.display.set_icon(pygame.image.load("../../assets/target.png"))
 
     osm = metadata["osm"]
+    ui_style = UIStyle()
     window = Window(osm)
     map_drawer = MapDrawer()
     load_player_sprites()
@@ -68,7 +69,8 @@ def main(args, game_id, player_id):
         player_state["vel"] = get_user_ctrl()
         player_state["pos"] += player_state["vel"] * PLAYER_SPEED * dt
 
-        window.update(events)
+        ui_style.update(events)
+        window.update(events, ui_style, player_state)
 
         # Draw
         surface.fill((255, 255, 255))

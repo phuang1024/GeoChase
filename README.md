@@ -22,6 +22,7 @@ Communication between like player types is encouraged.
 
 `python src/client/main.py` as many times as needed.
 
-Hotkeys:
+### Hotkeys:
 
-TODO
+- `WASD` or arrow keys to move.
+- `v` to toggle window view mode.

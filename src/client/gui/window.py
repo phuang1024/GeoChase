@@ -8,6 +8,7 @@ import numpy as np
 import pygame
 
 from constants import *
+from gui.ui import UIStyle
 from utils import *
 
 
@@ -85,7 +86,7 @@ class Window:
             "init_window_pos": None,
         }
 
-    def update(self, events):
+    def update(self, events, ui_style: UIStyle, player_state):
         for event in events:
             if event.type == pygame.VIDEORESIZE:
                 self.view_window.width = event.w
@@ -100,6 +101,8 @@ class Window:
                     self.drag_data["init_mouse_pos"] = np.array(event.pos)
                     self.drag_data["init_window_pos"] = self.view_window.pos.copy()
 
+                    ui_style.view_style = "free"
+
         mouse_pressed = pygame.mouse.get_pressed()
         mouse_pos = np.array(pygame.mouse.get_pos())
 
@@ -108,3 +111,6 @@ class Window:
                 delta = (mouse_pos - self.drag_data["init_mouse_pos"]) / self.view_window.scale
                 delta[1] *= -1
                 self.view_window.pos = self.drag_data["init_window_pos"] - delta
+
+        if ui_style.view_style == "follow":
+            self.view_window.pos = player_state["pos"].copy()
