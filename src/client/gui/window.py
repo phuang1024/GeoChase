@@ -66,9 +66,13 @@ class ViewWindow:
 
 
 class Window:
+    DEFAULT_SCALE = 0.75 / COORDS_TO_MILES
+    MIN_SCALE = 0.2 / COORDS_TO_MILES
+    MAX_SCALE = 3 / COORDS_TO_MILES
+
     def __init__(self, osm: OSM):
         self.view_window = ViewWindow(
-            0.75 / COORDS_TO_MILES,
+            self.DEFAULT_SCALE,
             osm.center,
             1280,
             720,
@@ -88,10 +92,9 @@ class Window:
                 self.view_window.height = event.h
 
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 4:
-                    self.view_window.y_size *= 1.1
-                elif event.button == 5:
-                    self.view_window.y_size /= 1.1
+                if event.button in (4, 5):
+                    self.view_window.y_size *= (1 / 1.1) if event.button == 4 else 1.1
+                    self.view_window.y_size = np.clip(self.view_window.y_size, self.MIN_SCALE, self.MAX_SCALE)
 
                 elif event.button == 1:
                     self.drag_data["init_mouse_pos"] = np.array(event.pos)

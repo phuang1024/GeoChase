@@ -8,7 +8,7 @@ from gui.main import main as game_loop
 from utils import *
 
 
-def get_session_id(args) -> tuple[str, str, str] | None:
+def get_session_id(args) -> tuple[str, str] | None:
     """
     Uses CLI to either start or join game.
 
@@ -40,14 +40,14 @@ def get_session_id(args) -> tuple[str, str, str] | None:
         })
 
         print("Game ID:", resp["game_id"])
-        return resp["game_id"], resp["player_id"], resp["type"]
+        return resp["game_id"], resp["player_id"]
 
     elif choice == "2":
         print("Join game:")
         game_id = input("  Game ID: ")
         resp = request(args.host, args.port, {"type": "join_game", "game_id": game_id})
         if resp["success"]:
-            return game_id, resp["player_id"], resp["type"]
+            return game_id, resp["player_id"]
         else:
             print("Invalid game ID.")
 
@@ -63,7 +63,7 @@ def get_session_id(args) -> tuple[str, str, str] | None:
         })
 
         print("Game ID:", resp["game_id"])
-        return resp["game_id"], resp["player_id"], resp["type"]
+        return resp["game_id"], resp["player_id"]
 
     else:
         print("Invalid choice.")
@@ -89,10 +89,10 @@ def main():
     if ret is None:
         return
 
-    game_id, player_id, player_type = ret
+    game_id, player_id = ret
     wait_for_start(args, game_id)
 
-    game_loop(args, game_id, player_id, player_type)
+    game_loop(args, game_id, player_id)
 
 
 if __name__ == "__main__":

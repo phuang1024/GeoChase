@@ -11,17 +11,18 @@ __all__ = (
 import pygame
 
 from constants import *
+from gui.map import ViewWindow
 
 SIZE = 50
 SPRITES = {}
 
 
-def draw_sprite(surface, map_drawer, type, pos):
+def draw_sprite(surface, view_window: ViewWindow, type, pos):
     if type == "spectator":
         return
 
     image = SPRITES[type]
-    pixel_pos = map_drawer.project(*pos[::-1])
+    pixel_pos = view_window.coord_to_px(pos)
     pixel_pos -= SIZE // 2
     surface.blit(image, pixel_pos)
 
