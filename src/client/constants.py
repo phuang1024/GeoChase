@@ -9,7 +9,9 @@ pygame.init()
 WIDTH = 1280
 HEIGHT = 720
 
-FONT = pygame.font.SysFont("courier", 16)
+TEXT_COLOR = (80, 80, 80)
+
+FONT = pygame.font.Font("../../assets/font.ttf", 16)
 
 # earth's circumference / 360
 COORDS_TO_MILES = 2 * math.pi * 3959 / 360

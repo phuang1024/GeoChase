@@ -101,7 +101,7 @@ class Window:
                     self.drag_data["init_mouse_pos"] = np.array(event.pos)
                     self.drag_data["init_window_pos"] = self.view_window.pos.copy()
 
-                    ui_style.view_style = "free"
+                    ui_style.view_style = False
 
         mouse_pressed = pygame.mouse.get_pressed()
         mouse_pos = np.array(pygame.mouse.get_pos())
@@ -112,5 +112,5 @@ class Window:
                 delta[1] *= -1
                 self.view_window.pos = self.drag_data["init_window_pos"] - delta
 
-        if ui_style.view_style == "follow":
+        if ui_style.view_style:
             self.view_window.pos = player_state["pos"].copy()

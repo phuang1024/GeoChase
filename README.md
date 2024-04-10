@@ -26,3 +26,4 @@ Communication between like player types is encouraged.
 
 - `WASD` or arrow keys to move.
 - `v` to toggle window view mode.
+- `i` to toggle info style.

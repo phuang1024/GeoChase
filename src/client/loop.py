@@ -17,10 +17,26 @@ from utils import *
 SERVER_INTERVAL = 1 / 5
 
 
+class Clock:
+    def __init__(self, fps):
+        self.period = 1 / fps
+        self.last_tick = 0
+
+    def is_tick(self):
+        return time.time() - self.last_tick > self.period
+
+    def tick(self):
+        while not self.is_tick():
+            time.sleep(0.001)
+        self.last_tick = time.time()
+
+
 def main(args, game_id, player_id):
+    clk_gui = Clock(60)
+
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     game_state = None
-    last_server_update = 0
+    clk_server = Clock(5)
 
     surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     pygame.display.set_caption("GeoChase")
@@ -40,7 +56,7 @@ def main(args, game_id, player_id):
     }
 
     while True:
-        time.sleep(1 / 60)
+        clk_gui.tick()
         dt = time.time() - last_loop_time
         last_loop_time = time.time()
 
@@ -51,7 +67,8 @@ def main(args, game_id, player_id):
                 return
 
         # Update status with server
-        if time.time() - last_server_update > SERVER_INTERVAL or game_state is None:
+        if game_state is None or clk_server.is_tick():
+            clk_server.tick()
             game_state = request(args.host, args.port, {
                 "type": "game_state",
                 "game_id": game_id,
@@ -77,6 +94,22 @@ def main(args, game_id, player_id):
         surface.blit(map_drawer.draw(window.view_window, osm), (0, 0))
 
         draw_sprite(surface, window.view_window, player_state["type"], player_state["pos"])
+
+        if ui_style.info_style > 0:
+            if ui_style.info_style == 2:
+                rect = pygame.Surface((270, surface.get_height()), pygame.SRCALPHA)
+                rect.fill((255, 255, 255, 220))
+                surface.blit(rect, (0, 0))
+                surface.blit(rect, (surface.get_width() - 270, 0))
+
+            draw_text(surface, TEXT_COLOR, [
+                f"fps: {int(1 / dt)}",
+                f"res: {surface.get_width()} , {surface.get_height()}",
+            ], (20, 20))
+            draw_text(surface, (60, 60, 60), [
+                f"pos: {player_state['pos'][0]:.4f} , {player_state['pos'][1]:.4f}",
+            ], (20, 100))
+            draw_text(surface, (60, 60, 60), game_state["alerts"], (surface.get_width() - 250, 20))
 
         # Update display
         pygame.display.update()

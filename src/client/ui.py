@@ -3,17 +3,23 @@ from dataclasses import dataclass
 import numpy as np
 import pygame
 
+from constants import *
+
 
 @dataclass
 class UIStyle:
-    view_style: str = "follow"
-    """'follow' or 'free'."""
+    view_style: bool = True
+    """True is follow, False is free"""
+    info_style: int = 2
+    """0=no, 1=text, 2=text+bg"""
 
     def update(self, events):
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_v:
-                    self.view_style = "follow" if self.view_style == "free" else "free"
+                    self.view_style = not self.view_style
+                elif event.key == pygame.K_i:
+                    self.info_style = (self.info_style + 1) % 3
 
 
 def get_user_ctrl():
@@ -37,3 +43,9 @@ def get_user_ctrl():
         vel /= np.linalg.norm(vel)
 
     return vel
+
+
+def draw_text(surface, color, lines, pos):
+    for i, line in enumerate(lines):
+        text = FONT.render(line, True, color)
+        surface.blit(text, (pos[0], pos[1] + i * 20))
