@@ -7,13 +7,13 @@ import time
 import numpy as np
 import pygame
 
-from collision import *
 from constants import *
-from mask import *
-from map import draw_osm
-from sprite import *
-from window import Window
-from ui import *
+from game.collision import *
+from game.mask import *
+from game.map import draw_osm
+from game.sprite import *
+from game.window import Window
+from game.ui import *
 from utils import *
 
 FPS = 60

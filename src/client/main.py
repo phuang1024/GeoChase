@@ -4,7 +4,7 @@ import time
 import pygame
 pygame.init()
 
-from loop import main as game_loop
+from game.loop import main as game_loop
 from utils import *
 
 

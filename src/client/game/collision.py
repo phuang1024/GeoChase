@@ -6,9 +6,9 @@ and keep player within roads.
 import pygame
 
 from constants import *
-from map import *
-from window import ViewWindow
-from ui import UIStyle
+from game.map import *
+from game.window import ViewWindow
+from game.ui import UIStyle
 
 COLL_STYLE = UIStyle(
     view_style=True,

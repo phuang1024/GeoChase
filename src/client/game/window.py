@@ -8,7 +8,7 @@ import numpy as np
 import pygame
 
 from constants import *
-from ui import UIStyle
+from game.ui import UIStyle
 from utils import *
 
 
