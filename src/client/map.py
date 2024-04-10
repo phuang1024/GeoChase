@@ -6,19 +6,20 @@ import numpy as np
 import pygame
 
 from window import ViewWindow
+from ui import UIStyle
 from utils import *
 
 
 class MapDrawer:
-    def draw(self, view: ViewWindow, osm: OSM) -> pygame.Surface:
+    def draw(self, view: ViewWindow, osm: OSM, ui: UIStyle) -> pygame.Surface:
         surface = pygame.Surface(view.resolution, pygame.SRCALPHA)
 
         # View bounds (left, top, right, bottom) in coords.
         view_bounds = view.px_to_coord(np.array([[0, 0], view.resolution])).flatten()
 
         for way in osm.ways:
-            # Don't draw buildings.
-            if "addr:street" in way.tags:
+            is_building = "addr:street" in way.tags
+            if not ui.draw_buildings and is_building:
                 continue
 
             # Check if in screen bounds.
@@ -30,7 +31,7 @@ class MapDrawer:
                 ):
                 continue
 
-            if way.tags.get("highway", None) not in VALID_ROAD_TYPES:
+            if not is_building and not ui.draw_all_ways and way.tags.get("highway", None) not in VALID_ROAD_TYPES:
                 continue
 
             # Draw lines

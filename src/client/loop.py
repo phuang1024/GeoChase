@@ -112,7 +112,7 @@ def main(args, game_id, player_id):
         surface.fill((255, 255, 255))
 
         # Draw map
-        surface.blit(map_drawer.draw(window.view_window, osm), (0, 0))
+        surface.blit(map_drawer.draw(window.view_window, osm, ui_style), (0, 0))
 
         # Draw players
         draw_sprite(surface, window.view_window, player_state["type"], player_state["pos"])
@@ -127,11 +127,13 @@ def main(args, game_id, player_id):
                 draw_sprite(surface, window.view_window, "target", target)
 
         # Draw masks
+        """
         if player_state["type"] != "spectator":
             radius = AIR_VIS if player_state["type"] == "heli" else GROUND_VIS
             radius *= window.view_window.scale[1]
             mask = circular_mask(surface.get_size(), window.view_window.coord_to_px(player_state["pos"]), radius)
             surface.blit(mask, (0, 0))
+        """
 
         # Draw UI
         if ui_style.info_style > 0:

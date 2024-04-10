@@ -27,3 +27,5 @@ Communication between like player types is encouraged.
 - `WASD` or arrow keys to move.
 - `v` to toggle window view mode.
 - `i` to toggle info style.
+- `b` to toggle drawing buildings (slow).
+- `p` to toggle draw all paths and roads.

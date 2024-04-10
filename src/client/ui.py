@@ -12,6 +12,8 @@ class UIStyle:
     """True is follow, False is free"""
     info_style: int = 2
     """0=no, 1=text, 2=text+bg"""
+    draw_buildings: bool = False
+    draw_all_ways: bool = False
 
     def update(self, events):
         for event in events:
@@ -20,6 +22,10 @@ class UIStyle:
                     self.view_style = not self.view_style
                 elif event.key == pygame.K_i:
                     self.info_style = (self.info_style + 1) % 3
+                elif event.key == pygame.K_b:
+                    self.draw_buildings = not self.draw_buildings
+                elif event.key == pygame.K_p:
+                    self.draw_all_ways = not self.draw_all_ways
 
 
 def get_user_ctrl():

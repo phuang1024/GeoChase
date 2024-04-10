@@ -94,7 +94,7 @@ def parse_osm(root):
                     tags[subchild.attrib["k"]] = subchild.attrib["v"]
             way_locs = np.array(way_locs)
 
-            if "highway" in tags:# or "addr:street" in tags:
+            if "highway" in tags or "addr:street" in tags:
                 way = Way(
                     nodes=way_locs,
                     left_top=np.min(way_locs, axis=0),
