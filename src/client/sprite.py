@@ -6,6 +6,7 @@ __all__ = (
     "SPRITES",
     "draw_sprite",
     "load_player_sprites",
+    "interp_others",
 )
 
 import pygame
@@ -48,3 +49,17 @@ def load_sprite(image: str):
 def load_player_sprites():
     for name in ("cop", "robber", "heli", "target"):
         SPRITES[name] = load_sprite(f"../../assets/{name}.png")
+
+
+def interp_others(others, time_left, dt):
+    """
+    Update `other_players` (in game loop) to get smooth movement of other players.
+    Assume that, in `time_left`, player moves from curr to expected.
+    Therefore, in this iteration, it moves dt / time_left of the way.
+    """
+    for id in others["expected"]:
+        if id not in others["curr"]:
+            others["curr"][id] = others["expected"][id]
+        else:
+            delta = others["expected"][id] - others["curr"][id]
+            others["curr"][id] += delta * dt / time_left

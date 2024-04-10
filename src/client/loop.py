@@ -14,7 +14,7 @@ from window import Window
 from ui import *
 from utils import *
 
-SERVER_INTERVAL = 1 / 5
+SERVER_INTERVAL = 1 / 10
 
 
 class Clock:
@@ -36,7 +36,7 @@ def main(args, game_id, player_id):
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     game_state = None
-    clk_server = Clock(5)
+    last_server_time = 0
 
     surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     pygame.display.set_caption("GeoChase")
@@ -54,6 +54,11 @@ def main(args, game_id, player_id):
         "pos": metadata["players"][player_id].pos,
         "vel": np.zeros(2),
     }
+    # Used to interpolate other players' positions
+    other_players = {
+        "curr": {},
+        "expected": {},
+    }
 
     while True:
         clk_gui.tick()
@@ -67,8 +72,9 @@ def main(args, game_id, player_id):
                 return
 
         # Update status with server
-        if game_state is None or clk_server.is_tick():
-            clk_server.tick()
+        if game_state is None or time.time() - last_server_time > SERVER_INTERVAL:
+            last_server_time = time.time()
+
             game_state = request(args.host, args.port, {
                 "type": "game_state",
                 "game_id": game_id,
@@ -76,11 +82,14 @@ def main(args, game_id, player_id):
                 "pos": player_state["pos"],
                 "vel": player_state["vel"],
             })
-            last_server_update = time.time()
 
             for player in game_state["players"].values():
                 if player.id == player_id:
+                    # Initialize player id
                     player_state["type"] = player.type
+                else:
+                    # Assume player travels with const vel for half the interval
+                    other_players["expected"][player.id] = player.pos + player.vel * PLAYER_SPEED * SERVER_INTERVAL / 2
 
         # Update game state
         player_state["vel"] = get_user_ctrl()
@@ -94,6 +103,10 @@ def main(args, game_id, player_id):
         surface.blit(map_drawer.draw(window.view_window, osm), (0, 0))
 
         draw_sprite(surface, window.view_window, player_state["type"], player_state["pos"])
+        interp_others(other_players, last_server_time + SERVER_INTERVAL - time.time(), dt)
+        for player in game_state["players"].values():
+            if player.id != player_id:
+                draw_sprite(surface, window.view_window, player.type, other_players["curr"][player.id])
 
         if ui_style.info_style > 0:
             if ui_style.info_style == 2:
