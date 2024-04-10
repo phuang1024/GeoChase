@@ -41,7 +41,9 @@ def handle_client(conn, addr, games):
 
         player_id = generate_id()
         player_type = random.choice(game.remaining_player_types())
-        game.players[player_id] = Player(player_id, player_type)
+        player = Player(player_id, player_type)
+        player.pos = np.array(game.osm.get_rand_pos())
+        game.players[player_id] = player
 
         send(conn, {"success": True, "game_id": game_id, "player_id": player_id, "type": player_type})
 
@@ -55,6 +57,7 @@ def handle_client(conn, addr, games):
             "osm": game.osm,
             "num_players": game.num_players,
             "num_robbers": game.num_robbers,
+            "players": game.players,
         })
 
     elif obj["type"] == "game_state":

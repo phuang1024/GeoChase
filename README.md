@@ -22,8 +22,11 @@ Communication between like player types is encouraged.
 
 `python src/client/main.py` as many times as needed.
 
-Hotkeys:
+### Hotkeys:
 
-- As a robber, `r` takes a target within proximity.
-- `n` toggles road names.
-- `i` toggles info display.
+- `WASD` or arrow keys to move.
+- `v` to toggle window view mode.
+- `i` to toggle info style.
+- `b` to toggle drawing buildings (slow).
+- `p` to toggle draw all paths and roads.
+- `c` to toggle show collision surface.

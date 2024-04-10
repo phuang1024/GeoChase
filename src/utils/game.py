@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-from .map import OSM
+from .map import OSM, Way
 
 
 class Game:
