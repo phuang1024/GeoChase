@@ -7,9 +7,10 @@ import time
 import numpy as np
 import pygame
 
+from collision import *
 from constants import *
 from mask import *
-from map import MapDrawer
+from map import draw_osm
 from sprite import *
 from window import Window
 from ui import *
@@ -52,7 +53,6 @@ def main(args, game_id, player_id):
     osm = metadata["osm"]
     ui_style = UIStyle()
     window = Window(osm)
-    map_drawer = MapDrawer()
     load_player_sprites()
 
     last_loop_time = time.time()
@@ -112,7 +112,7 @@ def main(args, game_id, player_id):
         surface.fill((255, 255, 255))
 
         # Draw map
-        surface.blit(map_drawer.draw(window.view_window, osm, ui_style), (0, 0))
+        surface.blit(draw_osm(window.view_window, osm, ui_style), (0, 0))
 
         # Draw players
         draw_sprite(surface, window.view_window, player_state["type"], player_state["pos"])
@@ -127,13 +127,11 @@ def main(args, game_id, player_id):
                 draw_sprite(surface, window.view_window, "target", target)
 
         # Draw masks
-        """
         if player_state["type"] != "spectator":
             radius = AIR_VIS if player_state["type"] == "heli" else GROUND_VIS
             radius *= window.view_window.scale[1]
             mask = circular_mask(surface.get_size(), window.view_window.coord_to_px(player_state["pos"]), radius)
             surface.blit(mask, (0, 0))
-        """
 
         # Draw UI
         if ui_style.info_style > 0:
@@ -152,6 +150,9 @@ def main(args, game_id, player_id):
                 f"pos: {player_state['pos'][0]:.4f} , {player_state['pos'][1]:.4f}",
             ], (20, 100))
             draw_text(surface, (60, 60, 60), game_state["alerts"], (surface.get_width() - 250, 20))
+
+        coll = make_roads_surf(player_state["pos"], osm)
+        surface.blit(coll, (0, 0))
 
         # Update display
         pygame.display.update()

@@ -67,7 +67,7 @@ class ViewWindow:
 
 
 class Window:
-    DEFAULT_SCALE = 0.75 / COORDS_TO_MILES
+    DEFAULT_SCALE = 0.5 / COORDS_TO_MILES
     MIN_SCALE = 0.2 / COORDS_TO_MILES
     MAX_SCALE = 3 / COORDS_TO_MILES
 
