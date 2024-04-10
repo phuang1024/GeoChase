@@ -11,7 +11,7 @@ __all__ = (
 import pygame
 
 from constants import *
-from gui.map import ViewWindow
+from map import ViewWindow
 
 SIZE = 50
 SPRITES = {}

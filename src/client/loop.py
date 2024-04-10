@@ -8,10 +8,10 @@ import numpy as np
 import pygame
 
 from constants import *
-from gui.map import MapDrawer
-from gui.sprite import *
-from gui.window import Window
-from gui.ui import *
+from map import MapDrawer
+from sprite import *
+from window import Window
+from ui import *
 from utils import *
 
 SERVER_INTERVAL = 1 / 5

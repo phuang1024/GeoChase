@@ -5,7 +5,7 @@ OSM map drawer.
 import numpy as np
 import pygame
 
-from gui.window import ViewWindow
+from window import ViewWindow
 from utils import *
 
 
