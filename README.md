@@ -29,3 +29,4 @@ Communication between like player types is encouraged.
 - `i` to toggle info style.
 - `b` to toggle drawing buildings (slow).
 - `p` to toggle draw all paths and roads.
+- `c` to toggle show collision surface.

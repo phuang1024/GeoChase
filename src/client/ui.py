@@ -14,6 +14,7 @@ class UIStyle:
     """0=no, 1=text, 2=text+bg"""
     draw_buildings: bool = False
     draw_all_ways: bool = False
+    show_coll: bool = False
 
     def update(self, events):
         for event in events:
@@ -26,6 +27,8 @@ class UIStyle:
                     self.draw_buildings = not self.draw_buildings
                 elif event.key == pygame.K_p:
                     self.draw_all_ways = not self.draw_all_ways
+                elif event.key == pygame.K_c:
+                    self.show_coll = not self.show_coll
 
 
 def get_user_ctrl():

@@ -18,7 +18,7 @@ COLL_STYLE = UIStyle(
 )
 
 
-def make_roads_surf(pos, osm: OSM):
+def make_coll_info(pos, osm: OSM) -> tuple[ViewWindow, pygame.Surface]:
     window = ViewWindow(
         y_size=COLL_RADIUS * 2,
         pos=pos,
@@ -28,4 +28,4 @@ def make_roads_surf(pos, osm: OSM):
     )
     surface = draw_osm(window, osm, UIStyle(), width=COLL_WIDTH)
     surface = pygame.transform.box_blur(surface, COLL_BLUR)
-    return surface
+    return window, surface

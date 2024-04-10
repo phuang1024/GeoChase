@@ -45,6 +45,7 @@ def main(args, game_id, player_id):
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     game_state = None
     last_server_time = 0
+    last_loop_time = time.time()
 
     surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
     pygame.display.set_caption("GeoChase")
@@ -55,7 +56,7 @@ def main(args, game_id, player_id):
     window = Window(osm)
     load_player_sprites()
 
-    last_loop_time = time.time()
+    coll_surf = None
     player_state = {
         "type": "",
         "pos": metadata["players"][player_id].pos,
@@ -103,7 +104,14 @@ def main(args, game_id, player_id):
 
         # Update game state
         player_state["vel"] = get_user_ctrl()
-        player_state["pos"] += player_state["vel"] * _pspeed(player_state["type"]) * dt
+        new_pos = player_state["pos"] + player_state["vel"] * _pspeed(player_state["type"]) * dt
+
+        if player_state["type"] in ("robber", "cop"):
+            coll_window, coll_surf = make_coll_info(player_state["pos"], osm)
+            if coll_surf.get_at(coll_window.coord_to_px(new_pos).astype(int)).a != 0:
+                player_state["pos"] = new_pos
+        else:
+            player_state["pos"] = new_pos
 
         ui_style.update(events)
         window.update(events, ui_style, player_state)
@@ -151,8 +159,8 @@ def main(args, game_id, player_id):
             ], (20, 100))
             draw_text(surface, (60, 60, 60), game_state["alerts"], (surface.get_width() - 250, 20))
 
-        coll = make_roads_surf(player_state["pos"], osm)
-        surface.blit(coll, (0, 0))
+        if coll_surf is not None and ui_style.show_coll:
+            surface.blit(coll_surf, (0, surface.get_height() - COLL_RES))
 
         # Update display
         pygame.display.update()
