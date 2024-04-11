@@ -57,6 +57,7 @@ def server_daemon(args, game_id, player_id, player_state, other_players, is_runn
 
         for k, v in game_state.items():
             r_game_state[k] = v
+        r_game_state["last_ping"] = time.time()
 
         for player in game_state["players"].values():
             if player.id == player_id:
@@ -72,7 +73,6 @@ def main(args, game_id, player_id):
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     game_state = {}
-    last_server_time = 0
     last_loop_time = time.time()
 
     surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
@@ -139,7 +139,7 @@ def main(args, game_id, player_id):
 
         # Draw players
         draw_sprite(surface, window.view_window, player_state["type"], player_state["pos"])
-        interp_others(other_players, last_server_time + SERVER_INTERVAL - time.time(), dt)
+        interp_others(other_players, game_state["last_ping"] + SERVER_INTERVAL - time.time(), dt)
         for player in game_state["players"].values():
             if player.id != player_id:
                 draw_sprite(surface, window.view_window, player.type, other_players["curr"][player.id])
