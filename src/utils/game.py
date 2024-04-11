@@ -7,6 +7,7 @@ __all__ = (
 Classes relating to gameplay.
 """
 
+import time
 from dataclasses import dataclass
 
 import numpy as np
@@ -23,11 +24,13 @@ class Game:
     num_cops: int
     alerts: list[str]
     targets: dict[int, "Target"]
+    last_ping: float
 
     def __init__(self):
         self.players = {}
         self.alerts = []
         self.targets = {}
+        self.last_ping = time.time()
 
     def num_players_of(self, type: str) -> int:
         return sum(1 for player in self.players.values() if player.type == type)

@@ -1,5 +1,6 @@
 import random
 import string
+import time
 
 import numpy as np
 from utils import *
@@ -17,6 +18,9 @@ def handle_client(conn, addr, games):
         return
 
     print(f"{addr}: {obj['type']}")
+
+    if obj.get("game_id", None) in games:
+        games[obj["game_id"]].last_ping = time.time()
 
     if obj["type"] == "echo":
         send(conn, obj["echo"])

@@ -4,6 +4,17 @@ import time
 import numpy as np
 
 
+def remove_old(games):
+    to_remove = []
+    for game_id, game in games.items():
+        if time.time() - game.last_ping > 10:
+            to_remove.append(game_id)
+
+    for game_id in to_remove:
+        print(f"Daemon: Removing game {game_id}")
+        del games[game_id]
+
+
 def update_game(game):
     # Trigger false alert with probability.
     if random.random() < 0.003:
@@ -27,6 +38,7 @@ def daemon(games):
         time.sleep(0.2)
 
         try:
+            remove_old(games)
             for game in games.values():
                 update_game(game)
         except Exception as e:
