@@ -98,7 +98,8 @@ def main(args, game_id, player_id):
 
     # Start server daemon
     is_running = [True]
-    Thread(target=server_daemon, args=(args, game_id, player_id, player_state, other_players, is_running, game_state)).start()
+    server_thread = Thread(target=server_daemon, args=(args, game_id, player_id, player_state, other_players, is_running, game_state))
+    server_thread.start()
     while not game_state:
         # Wait for first ping
         time.sleep(0.1)
@@ -113,6 +114,7 @@ def main(args, game_id, player_id):
         for event in events:
             if event.type == pygame.QUIT:
                 is_running[0] = False
+                server_thread.join()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and player_state["type"] == "robber":
                     request(args.host, args.port, {"type": "rob", "game_id": game_id, "pos": player_state["pos"]})
