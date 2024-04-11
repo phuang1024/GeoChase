@@ -25,19 +25,22 @@ def update_game(game):
     # Check if robber is captured.
     robbers = [x for x in game.players.values() if x.type == "robber"]
     cops = [x for x in game.players.values() if x.type == "cop"]
+    check_cops_win = False
     for robber in robbers:
         for cop in cops:
             if 1e-7 < np.linalg.norm(robber.pos - cop.pos) < 0.0004:
                 robber.type = "spectator"
                 game.alerts.append("Robber captured.")
+                check_cops_win = True
                 break
 
     # Check if cops win.
-    for player in game.players.values():
-        if player.type == "robber":
-            break
-    else:
-        game.alerts.append("Cops win!")
+    if check_cops_win:
+        for player in game.players.values():
+            if player.type == "robber":
+                break
+        else:
+            game.alerts.append("Cops win!")
 
 
 def daemon(games):
