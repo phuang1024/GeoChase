@@ -96,4 +96,7 @@ def handle_client(conn, addr, games):
             else:
                 game.alerts.append("Unknown")
 
+        if len(game.targets) == 0:
+            game.alerts.append("Robbers win!")
+
         send(conn, {"success": True})

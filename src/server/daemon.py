@@ -32,6 +32,13 @@ def update_game(game):
                 game.alerts.append("Robber captured.")
                 break
 
+    # Check if cops win.
+    for player in game.players.values():
+        if player.type == "robber":
+            break
+    else:
+        game.alerts.append("Cops win!")
+
 
 def daemon(games):
     while True:
