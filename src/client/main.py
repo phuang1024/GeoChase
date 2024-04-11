@@ -92,7 +92,11 @@ def main():
     game_id, player_id = ret
     wait_for_start(args, game_id)
 
-    game_loop(args, game_id, player_id)
+    surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
+    pygame.display.set_caption("GeoChase")
+    pygame.display.set_icon(pygame.image.load("../../assets/target.png"))
+
+    game_loop(surface, args, game_id, player_id)
 
 
 if __name__ == "__main__":

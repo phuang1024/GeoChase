@@ -39,17 +39,13 @@ class Clock:
         return time.time() - start
 
 
-def main(args, game_id, player_id):
+def main(surface: pygame.Surface, args, game_id, player_id):
     clk_gui = Clock(FPS)
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     game_state = None
     last_server_time = 0
     last_loop_time = time.time()
-
-    surface = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
-    pygame.display.set_caption("GeoChase")
-    pygame.display.set_icon(pygame.image.load("../../assets/target.png"))
 
     osm = metadata["osm"]
     ui_style = UIStyle()

@@ -56,5 +56,5 @@ def get_user_ctrl():
 
 def draw_text(surface, color, lines, pos):
     for i, line in enumerate(lines):
-        text = FONT.render(line, True, color)
+        text = FONT_SMALL.render(line, True, color)
         surface.blit(text, (pos[0], pos[1] + i * 20))
