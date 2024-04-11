@@ -82,7 +82,7 @@ def handle_client(conn, addr, games):
 
         to_remove = []
         for key, target in game.targets.items():
-            if np.linalg.norm(target.pos - pos) < 0.001:
+            if np.linalg.norm(target.pos - pos) < 0.0004:
                 to_remove.append(key)
         for key in to_remove:
             target = game.targets.pop(key)

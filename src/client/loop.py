@@ -120,7 +120,7 @@ def main(args, game_id, player_id):
         surface.fill((255, 255, 255))
 
         # Draw map
-        surface.blit(draw_osm(window.view_window, osm, ui_style), (0, 0))
+        surface.blit(draw_osm(window.view_window, osm, ui_style, 2), (0, 0))
 
         # Draw players
         draw_sprite(surface, window.view_window, player_state["type"], player_state["pos"])
@@ -149,14 +149,25 @@ def main(args, game_id, player_id):
                 surface.blit(rect, (0, 0))
                 surface.blit(rect, (surface.get_width() - 270, 0))
 
+            player_counts = {"robber": 0, "cop": 0, "heli": 0}
+            for player in game_state["players"].values():
+                if player.type in player_counts:
+                    player_counts[player.type] += 1
+            game_info = [
+                f"pos: {player_state['pos'][0]:.4f} , {player_state['pos'][1]:.4f}",
+                f"robbers: {player_counts['robber']}",
+                f"cops: {player_counts['cop']}",
+                f"helis: {player_counts['heli']}",
+            ]
+            if player_state["type"] == "robber":
+                game_info.append(f"targets: {len(game_state['targets'])}")
+
             draw_text(surface, TEXT_COLOR, [
                 f"fps: {int(1 / dt)}",
                 f"res: {surface.get_width()} , {surface.get_height()}",
                 f"util: {int(100 * (1 - idle_time / (1 / FPS)))}%",
             ], (20, 20))
-            draw_text(surface, (60, 60, 60), [
-                f"pos: {player_state['pos'][0]:.4f} , {player_state['pos'][1]:.4f}",
-            ], (20, 100))
+            draw_text(surface, (60, 60, 60), game_info, (20, 100))
             draw_text(surface, (60, 60, 60), game_state["alerts"], (surface.get_width() - 250, 20))
 
         if coll_surf is not None and ui_style.show_coll:

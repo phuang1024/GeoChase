@@ -18,23 +18,22 @@ def draw_osm(view: ViewWindow, osm: OSM, ui: UIStyle, width: int = 1) -> pygame.
 
     for way in osm.ways:
         is_building = "addr:street" in way.tags
+        is_main_way = way.tags.get("highway", None) in VALID_ROAD_TYPES
         if not ui.draw_buildings and is_building:
             continue
 
-        # Check if in screen bounds.
-        if (
-                way.right_bottom[0] < view_bounds[0]
-                or way.left_top[0] > view_bounds[2]
-                or way.right_bottom[1] < view_bounds[3]
-                or way.left_top[1] > view_bounds[1]
-            ):
-            continue
+        if is_building or ui.draw_all_ways or is_main_way:
+            # Check if in screen bounds.
+            if (
+                    way.right_bottom[0] < view_bounds[0]
+                    or way.left_top[0] > view_bounds[2]
+                    or way.right_bottom[1] < view_bounds[3]
+                    or way.left_top[1] > view_bounds[1]
+                ):
+                continue
 
-        if not is_building and not ui.draw_all_ways and way.tags.get("highway", None) not in VALID_ROAD_TYPES:
-            continue
-
-        # Draw lines
-        points = view.coord_to_px(way.nodes)
-        pygame.draw.lines(surface, (0, 0, 0, 255), False, points, width)
+            # Draw lines
+            points = view.coord_to_px(way.nodes)
+            pygame.draw.lines(surface, (0, 0, 0, 255), False, points, width if is_main_way else 1)
 
     return surface

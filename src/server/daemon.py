@@ -6,7 +6,7 @@ import numpy as np
 
 def update_game(game):
     # Trigger false alert with probability.
-    if random.random() < 0.004:
+    if random.random() < 0.003:
         road = game.osm.get_rand_road()
         if "name" in road.tags:
             game.alerts.append(f"{road.tags['name']}")
@@ -16,7 +16,7 @@ def update_game(game):
     cops = [x for x in game.players.values() if x.type == "cop"]
     for robber in robbers:
         for cop in cops:
-            if 1e-7 < np.linalg.norm(robber.pos - cop.pos) < 0.001:
+            if 1e-7 < np.linalg.norm(robber.pos - cop.pos) < 0.0004:
                 robber.type = "spectator"
                 game.alerts.append("Robber captured.")
                 break
