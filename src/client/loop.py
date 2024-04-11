@@ -114,7 +114,7 @@ def main(args, game_id, player_id):
             player_state["pos"] = new_pos
 
         ui_style.update(events)
-        window.update(events, ui_style, player_state)
+        window.update(events, ui_style, player_state, dt)
 
         # Draw
         surface.fill((255, 255, 255))
