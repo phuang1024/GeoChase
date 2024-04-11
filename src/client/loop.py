@@ -3,6 +3,7 @@ GUI (pygame) main game loop.
 """
 
 import time
+from threading import Thread
 
 import numpy as np
 import pygame
@@ -39,11 +40,38 @@ class Clock:
         return time.time() - start
 
 
+def server_daemon(args, game_id, player_id, player_state, other_players, is_running, r_game_state):
+    """
+    is_running: [True] or [False] to stop the daemon
+    """
+    while is_running[0]:
+        time.sleep(SERVER_INTERVAL)
+
+        game_state = request(args.host, args.port, {
+            "type": "game_state",
+            "game_id": game_id,
+            "player_id": player_id,
+            "pos": player_state["pos"],
+            "vel": player_state["vel"],
+        })
+
+        for k, v in game_state.items():
+            r_game_state[k] = v
+
+        for player in game_state["players"].values():
+            if player.id == player_id:
+                # Initialize player id
+                player_state["type"] = player.type
+            else:
+                # Assume player travels with const vel for half the interval
+                other_players["expected"][player.id] = player.pos + player.vel * _pspeed(player.type) * SERVER_INTERVAL / 2
+
+
 def main(args, game_id, player_id):
     clk_gui = Clock(FPS)
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
-    game_state = None
+    game_state = {}
     last_server_time = 0
     last_loop_time = time.time()
 
@@ -68,7 +96,14 @@ def main(args, game_id, player_id):
         "expected": {},
     }
 
-    while True:
+    # Start server daemon
+    is_running = [True]
+    Thread(target=server_daemon, args=(args, game_id, player_id, player_state, other_players, is_running, game_state)).start()
+    while not game_state:
+        # Wait for first ping
+        time.sleep(0.1)
+
+    while is_running[0]:
         idle_time = clk_gui.tick()
         dt = time.time() - last_loop_time
         last_loop_time = time.time()
@@ -77,30 +112,10 @@ def main(args, game_id, player_id):
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
-                return
+                is_running[0] = False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r and player_state["type"] == "robber":
                     request(args.host, args.port, {"type": "rob", "game_id": game_id, "pos": player_state["pos"]})
-
-        # Update status with server
-        if game_state is None or time.time() - last_server_time > SERVER_INTERVAL:
-            last_server_time = time.time()
-
-            game_state = request(args.host, args.port, {
-                "type": "game_state",
-                "game_id": game_id,
-                "player_id": player_id,
-                "pos": player_state["pos"],
-                "vel": player_state["vel"],
-            })
-
-            for player in game_state["players"].values():
-                if player.id == player_id:
-                    # Initialize player id
-                    player_state["type"] = player.type
-                else:
-                    # Assume player travels with const vel for half the interval
-                    other_players["expected"][player.id] = player.pos + player.vel * _pspeed(player.type) * SERVER_INTERVAL / 2
 
         # Update game state
         player_state["vel"] = get_user_ctrl()
