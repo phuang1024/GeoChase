@@ -57,6 +57,7 @@ def interp_others(others, time_left, dt):
     Assume that, in `time_left`, player moves from curr to expected.
     Therefore, in this iteration, it moves dt / time_left of the way.
     """
+    time_left = max(time_left, dt)
     for id in others["expected"]:
         if id not in others["curr"]:
             others["curr"][id] = others["expected"][id]
