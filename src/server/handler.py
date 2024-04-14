@@ -1,5 +1,6 @@
 import random
 import string
+import time
 
 import numpy as np
 from utils import *
@@ -17,6 +18,9 @@ def handle_client(conn, addr, games):
         return
 
     print(f"{addr}: {obj['type']}")
+
+    if obj.get("game_id", None) in games:
+        games[obj["game_id"]].last_ping = time.time()
 
     if obj["type"] == "echo":
         send(conn, obj["echo"])
@@ -82,7 +86,7 @@ def handle_client(conn, addr, games):
 
         to_remove = []
         for key, target in game.targets.items():
-            if np.linalg.norm(target.pos - pos) < 0.001:
+            if np.linalg.norm(target.pos - pos) < 0.0004:
                 to_remove.append(key)
         for key in to_remove:
             target = game.targets.pop(key)
@@ -91,5 +95,8 @@ def handle_client(conn, addr, games):
                 game.alerts.append(f"{target.street.tags['name']}")
             else:
                 game.alerts.append("Unknown")
+
+        if len(game.targets) == 0:
+            game.alerts.append("Robbers win!")
 
         send(conn, {"success": True})

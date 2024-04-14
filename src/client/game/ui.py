@@ -8,8 +8,8 @@ from constants import *
 
 @dataclass
 class UIStyle:
-    view_style: bool = True
-    """True is follow, False is free"""
+    view_style: int = 2
+    """0=free, 1=follow, 2=smooth_follow"""
     info_style: int = 2
     """0=no, 1=text, 2=text+bg"""
     draw_buildings: bool = False
@@ -20,7 +20,7 @@ class UIStyle:
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_v:
-                    self.view_style = not self.view_style
+                    self.view_style = (self.view_style + 1) % 3
                 elif event.key == pygame.K_i:
                     self.info_style = (self.info_style + 1) % 3
                 elif event.key == pygame.K_b:

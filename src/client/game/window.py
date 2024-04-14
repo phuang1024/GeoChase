@@ -86,7 +86,7 @@ class Window:
             "init_window_pos": None,
         }
 
-    def update(self, events, ui_style: UIStyle, player_state):
+    def update(self, events, ui_style: UIStyle, player_state, dt):
         for event in events:
             if event.type == pygame.VIDEORESIZE:
                 self.view_window.width = event.w
@@ -101,7 +101,7 @@ class Window:
                     self.drag_data["init_mouse_pos"] = np.array(event.pos)
                     self.drag_data["init_window_pos"] = self.view_window.pos.copy()
 
-                    ui_style.view_style = False
+                    ui_style.view_style = 0
 
         mouse_pressed = pygame.mouse.get_pressed()
         mouse_pos = np.array(pygame.mouse.get_pos())
@@ -112,5 +112,8 @@ class Window:
                 delta[1] *= -1
                 self.view_window.pos = self.drag_data["init_window_pos"] - delta
 
-        if ui_style.view_style:
+        if ui_style.view_style == 1:
             self.view_window.pos = player_state["pos"].copy()
+        elif ui_style.view_style == 2:
+            fac = dt * 3
+            self.view_window.pos = (1 - fac) * self.view_window.pos + fac * player_state["pos"]
