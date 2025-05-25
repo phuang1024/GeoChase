@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 import time
 
 import pygame
@@ -81,7 +82,7 @@ def wait_for_start(args, game_id):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", type=str, default="")
+    parser.add_argument("--host", type=str, default="localhost")
     parser.add_argument("--port", type=int, default=4580)
     args = parser.parse_args()
 
@@ -92,7 +93,7 @@ def main():
     game_id, player_id = ret
     wait_for_start(args, game_id)
 
-    game_loop(args, game_id, player_id)
+    asyncio.run(game_loop(args, game_id, player_id))
 
 
 if __name__ == "__main__":

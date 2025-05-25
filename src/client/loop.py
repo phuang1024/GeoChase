@@ -2,6 +2,7 @@
 GUI (pygame) main game loop.
 """
 
+import asyncio
 import time
 from threading import Thread
 
@@ -68,8 +69,8 @@ def server_daemon(args, game_id, player_id, player_state, other_players, is_runn
                 other_players["expected"][player.id] = player.pos + player.vel * _pspeed(player.type) * SERVER_INTERVAL / 2
 
 
-def main(args, game_id, player_id):
-    clk_gui = Clock(FPS)
+async def main(args, game_id, player_id):
+    #clk_gui = Clock(FPS)
 
     metadata = request(args.host, args.port, {"type": "game_metadata", "game_id": game_id})
     game_state = {}
@@ -105,9 +106,10 @@ def main(args, game_id, player_id):
         time.sleep(0.1)
 
     while is_running[0]:
-        idle_time = clk_gui.tick()
+        idle_time = 0#clk_gui.tick()
         dt = time.time() - last_loop_time
         last_loop_time = time.time()
+        await asyncio.sleep(1 / FPS)
 
         # Check global events
         events = pygame.event.get()
